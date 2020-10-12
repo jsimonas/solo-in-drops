@@ -203,7 +203,7 @@ process fastqc {
  * STEP 3 - MultiQC
  */
 process multiqc {
-    publishDir "$${params.outdir}/${runName}/multiqc", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
 
     input:
     file (multiqc_config) from ch_multiqc_config
