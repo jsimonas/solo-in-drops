@@ -141,7 +141,7 @@ process get_software_versions {
 /*
  * STEP 1 - convert bcl to fastq files
  */
-process bcltofastq {
+process bcl_to_fastq {
     tag "$name"
     label 'process_high'
     publishDir path: "${params.outdir}/${runName}/fastq", mode: 'copy'
@@ -150,12 +150,8 @@ process bcltofastq {
     file sheet from sheet_file
 
     output:
-    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
-    file "*/**{I1,I2}_001.fastq.gz" into fastqs_idx_ch
-    file "*{R1,R2,R3}_001.fastq.gz" into undetermined_default_fq_ch mode flatten
-    file "*{I1,I2}_001.fastq.gz" into undetermined_idx_fq_ch
-    file "Reports" into b2fq_default_reports_ch
-    file "Stats" into b2fq_default_stats_ch
+    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
+    file "*{I1,I2}_001.fastq.gz" into fastqs_idx_ch
 
     script:
     """
@@ -175,27 +171,22 @@ process bcltofastq {
 /*
  * STEP 2 - FastQC
  */
-fqname_fqfile_ch = fastqs_fqc_ch.map { fqFile -> [fqFile.getParent().getName(), fqFile ] }
-undetermined_default_fqfile_tuple_ch = undetermined_default_fq_ch.map { fqFile -> ["Undetermined_default", fqFile ] }
-
-fastqcAll = Channel.empty()
-fastqcAll_ch = fastqcAll.mix(fqname_fqfile_ch, undetermined_default_fqfile_tuple_ch)
 
 process fastqc {
     tag "$name"
-    publishDir path: "${params.outdir}/${runName}/fastqc", mode: 'copy'
-    label 'process_high'
-
+    label 'process_medium'
+    publishDir "${params.outdir}/${runName}/fastqc", mode: 'copy',
+        saveAs: { filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename" }
+        
     input:
-    set val(name), file(fqFile) from fastqcAll_ch
+    set val(name), file(reads) from fastqs_fqc_ch
 
     output:
-    set val(name), file("*_fastqc") into ch_fastqc_results
-    file "*.html" into fqc_html_ch
+    file "*_fastqc.{zip,html}" into fastqc_results
 
     script:
     """
-    fastqc --extract ${fqFile}
+    fastqc --quiet --threads $task.cpus $reads
     """
 }
 
