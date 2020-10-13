@@ -189,7 +189,30 @@ process fastqc {
 }
 
 /*
- * STEP 3 - MultiQC
+ * STEP 3 - Merge FASTQ
+ */
+
+Channel
+  .fromFilePairs("${params.outdir}/${runName}/fastq/*_R{1,2}_001.fastq.gz", flat: true) 
+  .set {reads}
+
+process mergefastq {
+    tag "$id"
+    label 'process_medium'
+    publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
+    
+    input: 
+    set val(id), file(read1), file(read2) from reads
+    
+    // TODO: for rev complements, it will be introduced thru parameter
+    // fuse.sh in1=$read2 in2=$read1 out=${id}_merged.fastq.gz fusepairs pad=0
+    """
+    seqkit concat $read2 $read1 > ${id}_merged.fastq.gz --threads $task.cpus
+    """
+}
+
+/*
+ * STEP 4 - MultiQC
  */
 process multiqc {
     publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
