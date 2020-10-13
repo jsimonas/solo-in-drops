@@ -151,7 +151,6 @@ process bcl_to_fastq {
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
-    file "*{I1,I2}_001.fastq.gz" into fastqs_idx_ch
 
     script:
     """
@@ -173,20 +172,19 @@ process bcl_to_fastq {
  */
 
 process fastqc {
-    tag "$name"
+    tag "$fastq"
     label 'process_medium'
-    publishDir "${params.outdir}/${runName}/fastqc", mode: 'copy',
-        saveAs: { filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename" }
+    publishDir "${params.outdir}/${runName}/fastqc", mode: 'copy'
         
     input:
-    set val(name), file(reads) from fastqs_fqc_ch
+    file(fastq) from fastqs_fqc_ch
 
     output:
     file "*_fastqc.{zip,html}" into fastqc_results
 
     script:
     """
-    fastqc --quiet --threads $task.cpus $reads
+    fastqc --quiet --threads $task.cpus ${fastq}
     """
 }
 
