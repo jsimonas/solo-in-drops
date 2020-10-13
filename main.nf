@@ -151,6 +151,7 @@ process bcl_to_fastq {
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
+    set val(sampleId) file "*{R1,R2,R3}_001.fastq.gz" into fastqs_merge_ch
 
     script:
     """
@@ -166,6 +167,15 @@ process bcl_to_fastq {
     --processing-threads $task.cpus
     """
 }
+
+// filter out 'Undetermined' fastq files
+//fastq_output.flatMap()
+//            .map{ item ->
+//                if (! "${item}".contains("Undetermined_")){
+//                    return item
+//                }
+//            }
+//            .set{ fastq_filtered }
 
 /*
  * STEP 2 - FastQC
@@ -192,22 +202,19 @@ process fastqc {
  * STEP 3 - Merge FASTQ
  */
 
-Channel
-  .fromFilePairs("${params.outdir}/${runName}/fastq/*_R{1,2}_001.fastq.gz", flat: true) 
-  .set {reads}
-
 process mergefastq {
-    tag "$id"
+    tag "$sampleId"
     label 'process_medium'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
     input: 
-    set val(id), file(read1), file(read2) from reads
+    set val(sampleId), file(read1), file(read2), file(read3) from fastqs_merge_ch
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=$read2 in2=$read1 out=${id}_merged.fastq.gz fusepairs pad=0
     """
-    seqkit concat $read2 $read1 > ${id}_merged.fastq.gz --threads $task.cpus
+    seqkit concat $read2 $read1 > ${sampleId}_merged.fastq.gz --threads $task.cpus
+    cp $read3 ${params.outdir}/${runName}/merged_fastqc/
     """
 }
 
