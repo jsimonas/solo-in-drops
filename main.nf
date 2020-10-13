@@ -151,7 +151,7 @@ process bcl_to_fastq {
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
-    set val(sampleId) file "*{R1,R2,R3}_001.fastq.gz" into fastqs_merge_ch
+    set sampleId, file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
 
     script:
     """
@@ -209,6 +209,9 @@ process mergefastq {
     
     input: 
     set val(sampleId), file(read1), file(read2), file(read3) from fastqs_merge_ch
+    
+    output:
+    file "*_fastqc.{zip,html}" into fastqc_results
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=$read2 in2=$read1 out=${id}_merged.fastq.gz fusepairs pad=0
