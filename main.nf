@@ -181,14 +181,14 @@ def get_prefix( file ) {
  fastqs_merge_ch
     .map { prefix, file1, file2, file3 -> tuple(get_prefix(file1), file1, file2, file3) }
     .groupTuple()
-    .set { fastqs_merge_paired_ch, fastqs_merge_paired_ch_print }
+    .set { fastq_pairs_ch }
 
 //fastqs_merge_ch
 //    .map {prefix, fastq -> [ get_prefix(fastq), fastq] }
 //    .groupTuple()
 //    .set{ fastq_pairs_ch }
 
-fastqs_merge_paired_ch.println { "\nReceived this: $it" }
+fastq_pairs_ch.println { "\nReceived this: $it" }
 
 
 // filter out 'Undetermined' fastq files
