@@ -168,7 +168,18 @@ process bcl_to_fastq {
     """
 }
 
-fastqs_merge_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+
+fastqs_merge_ch.flatMap().map{ file ->
+               if ("${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_") ){
+                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
+                    def key = key_match[0][1]
+                    return tuple(key, file)
+               }
+            }
+            .groupTuple()
+            .into{ fastq_pairs_ch }
+
+fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 // filter out 'Undetermined' fastq files
 //fastq_output.flatMap()
