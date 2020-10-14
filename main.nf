@@ -168,19 +168,6 @@ process bcl_to_fastq {
     """
 }
 
-
-fastqs_merge_ch.flatMap().map{ file ->
-               if ("${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_") ){
-                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
-                    def key = key_match[0][1]
-                    return tuple(key, file)
-               }
-            }
-            .groupTuple()
-            .into{ fastq_pairs_ch }
-
-fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
-
 // filter out 'Undetermined' fastq files
 //fastq_output.flatMap()
 //            .map{ item ->
@@ -191,34 +178,18 @@ fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 //            .set{ fastq_filtered }
 
 
-// function to get prefix
-def get_prefix( file ) {
-    def sampleName = (file =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/)
-    if (sampleName.find()) {
-        return sampleName.group(1)
-    }
-    return file
-}
+// make paired channel for fastqs
+fastqs_merge_ch.flatMap().map{ file ->
+               if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_") && ! "${file}".contains("Undetermined_") ){
+                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
+                    def key = key_match[0][1]
+                    return tuple(key, file)
+               }
+            }
+            .groupTuple()
+            .into{ fastq_pairs_ch }
 
-//fastqs_merge_ch
-//    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
-//    .groupTuple()
-//    .set { fastq_pairs_ch }
-
-
-//fastqs_merge_ch
-//    .map { fastq -> [ get_prefix(fastq), fastq] }
-//    .groupTuple()
-//    .set{ fastq_pairs_ch }
-
-
-//fastqs_merge_ch
-//    .map {prefix, fastq -> [ (prefix =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/), fastq] }
-//    .groupTuple()
-//    .set{ fastq_pairs_ch }
-
-//fastq_pairs_ch.println()
-
+fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 2 - FastQC
