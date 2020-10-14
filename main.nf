@@ -183,14 +183,17 @@ def get_prefix( file ) {
 //    .groupTuple()
 //    .set { fastq_pairs_ch }
 
-//fastqs_merge_ch
-//    .fromFilePairs("*{R1,R2,R3}_001.fastq.gz")
-//    .set { fastq_pairs_ch }
 
-// fastqs_merge_ch
+//fastqs_merge_ch
 //    .map { fastq -> [ get_prefix(fastq), fastq] }
 //    .groupTuple()
 //    .set{ fastq_pairs_ch }
+
+
+fastqs_merge_ch
+    .map {prefix, fastq -> [ (prefix =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/), fastq] }
+    .groupTuple()
+    .set{ fastq_pairs_ch }
 
 fastq_pairs_ch.println { "\nReceived this: $it" }
 
