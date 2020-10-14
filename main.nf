@@ -179,9 +179,9 @@ def get_prefix( file ) {
 }
 
 fastqs_merge_ch
-    .map { prefix, file1, file2, file3 -> tuple(get_prefix("*{R1,R2,R3}_001.fastq.gz"), file1, file2, file3) }
+    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
     .groupTuple()
-    .set { fastqs_merge_paired_ch,  fastqs_merge_paired_ch_print }
+    .set { fastqs_merge_paired_ch, fastqs_merge_paired_ch_print }
 
 fastqs_merge_paired_ch_print.println { "\nReceived this: $it" }
 
