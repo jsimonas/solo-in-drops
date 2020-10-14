@@ -178,10 +178,14 @@ def get_prefix( file ) {
     return file
 }
 
-fastqs_merge_ch
-    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
-    .groupTuple()
-    .set { fastq_pairs_ch }
+//fastqs_merge_ch
+//    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
+//    .groupTuple()
+//    .set { fastq_pairs_ch }
+
+//fastqs_merge_ch
+//    .fromFilePairs("*{R1,R2,R3}_001.fastq.gz")
+//    .set { fastq_pairs_ch }
 
 // fastqs_merge_ch
 //    .map { fastq -> [ get_prefix(fastq), fastq] }
