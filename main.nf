@@ -186,9 +186,9 @@ def get_prefix( file ) {
 fastqs_merge_ch
     .map { fastq -> [ getFastqPairName(fastq), fastq] }
     .groupTuple()
-    .set{ fastqs_merge_paired_ch, fastqs_merge_paired_ch_print }
+    .set{ fastq_pairs_ch }
 
-fastqs_merge_paired_ch_print.println { "\nReceived this: $it" }
+ffastq_pairs_ch.println { "\nReceived this: $it" }
 
 
 // filter out 'Undetermined' fastq files
@@ -225,24 +225,24 @@ process fastqc {
  * STEP 3 - Merge FASTQ
  */
 
-process mergefastq {
-    tag "$sampleId"
-    label 'process_medium'
-    publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
+//process mergefastq {
+//    tag "$sampleId"
+//    label 'process_medium'
+//    publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
-    input: 
-    set prefix, file(read1), file(read2), file(read3) from fastqs_merge_paired_ch
+//    input: 
+//    set prefix, file(read1), file(read2), file(read3) from fastqs_merge_paired_ch
     
-    output:
-    file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch
+//    output:
+//    file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=$read2 in2=$read1 out=${id}_merged.fastq.gz fusepairs pad=0
-    """
-    seqkit concat $read2 $read1 > ${sampleId}_R21_001.fastq.gz --threads $task.cpus
-    cp $read3 ${params.outdir}/${runName}/merged_fastqc/
-    """
-}
+//    """
+//    seqkit concat $read2 $read1 > ${sampleId}_R21_001.fastq.gz --threads $task.cpus
+//    cp $read3 ${params.outdir}/${runName}/merged_fastqc/
+//    """
+//}
 
 /*
  * STEP 4 - MultiQC
