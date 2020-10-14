@@ -178,15 +178,15 @@ def get_prefix( file ) {
     return file
 }
 
-// fastqs_merge_ch
-//    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
-//    .groupTuple()
-//    .set { fastqs_merge_paired_ch, fastqs_merge_paired_ch_print }
-
 fastqs_merge_ch
-    .map { fastq -> [ get_prefix(fastq), fastq] }
+    .map { prefix, file1, file2, file3 -> tuple(get_prefix(file), file1, file2, file3) }
     .groupTuple()
-    .set{ fastq_pairs_ch }
+    .set { fastq_pairs_ch }
+
+// fastqs_merge_ch
+//    .map { fastq -> [ get_prefix(fastq), fastq] }
+//    .groupTuple()
+//    .set{ fastq_pairs_ch }
 
 fastq_pairs_ch.println { "\nReceived this: $it" }
 
