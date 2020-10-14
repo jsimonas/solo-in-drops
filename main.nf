@@ -168,6 +168,17 @@ process bcl_to_fastq {
     """
 }
 
+fastqs_merge_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+
+// filter out 'Undetermined' fastq files
+//fastq_output.flatMap()
+//            .map{ item ->
+//                if (! "${item}".contains("Undetermined_")){
+//                    return item
+//                }
+//            }
+//            .set{ fastq_filtered }
+
 
 // function to get prefix
 def get_prefix( file ) {
@@ -184,10 +195,10 @@ def get_prefix( file ) {
 //    .set { fastq_pairs_ch }
 
 
-fastqs_merge_ch
-    .map { fastq -> [ get_prefix(fastq), fastq] }
-    .groupTuple()
-    .set{ fastq_pairs_ch }
+//fastqs_merge_ch
+//    .map { fastq -> [ get_prefix(fastq), fastq] }
+//    .groupTuple()
+//    .set{ fastq_pairs_ch }
 
 
 //fastqs_merge_ch
@@ -195,17 +206,8 @@ fastqs_merge_ch
 //    .groupTuple()
 //    .set{ fastq_pairs_ch }
 
-fastq_pairs_ch.println()
+//fastq_pairs_ch.println()
 
-
-// filter out 'Undetermined' fastq files
-//fastq_output.flatMap()
-//            .map{ item ->
-//                if (! "${item}".contains("Undetermined_")){
-//                    return item
-//                }
-//            }
-//            .set{ fastq_filtered }
 
 /*
  * STEP 2 - FastQC
