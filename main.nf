@@ -151,9 +151,11 @@ process bcl_to_fastq {
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
-    set sampleId, file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
+    set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
 
     script:
+    sampleId = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+
     """
     bcl2fastq \\
     --runfolder-dir ${runDir} \\
