@@ -184,18 +184,18 @@ def get_prefix( file ) {
 //    .set { fastq_pairs_ch }
 
 
-//fastqs_merge_ch
-//    .map { fastq -> [ get_prefix(fastq), fastq] }
-//    .groupTuple()
-//    .set{ fastq_pairs_ch }
-
-
 fastqs_merge_ch
-    .map {prefix, fastq -> [ (prefix =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/), fastq] }
+    .map { fastq -> [ get_prefix(fastq), fastq] }
     .groupTuple()
     .set{ fastq_pairs_ch }
 
-fastq_pairs_ch.println { "\nReceived this: $it" }
+
+//fastqs_merge_ch
+//    .map {prefix, fastq -> [ (prefix =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/), fastq] }
+//    .groupTuple()
+//    .set{ fastq_pairs_ch }
+
+fastq_pairs_ch.println()
 
 
 // filter out 'Undetermined' fastq files
