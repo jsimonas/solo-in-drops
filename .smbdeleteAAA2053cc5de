@@ -1,3 +1,0 @@
-Oct-14 15:38:15.490 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /Volumes/simonas/Documents/Projects/scRNA_seq/inDrops/solo-in-drops/nextflow.config
-Oct-14 15:38:15.493 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Volumes/simonas/Documents/Projects/scRNA_seq/inDrops/solo-in-drops/nextflow.config
-Oct-14 15:38:15.508 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
