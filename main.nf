@@ -188,7 +188,7 @@ fastqs_merge_ch
     .groupTuple()
     .set{ fastq_pairs_ch }
 
-ffastq_pairs_ch.println { "\nReceived this: $it" }
+fastq_pairs_ch.println { "\nReceived this: $it" }
 
 
 // filter out 'Undetermined' fastq files
