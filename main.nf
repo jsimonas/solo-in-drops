@@ -168,12 +168,23 @@ process bcl_to_fastq {
     """
 }
 
+
+// function to get prefix
+def get_prefix( file ) {
+    def sampleName = (file =~ /.*\/(.+)_[R][123]_001\.fastq\.gz/)
+    if (sampleName.find()) {
+        return sampleName.group(1)
+    }
+    return file
+}
+
 fastqs_merge_ch
-    .map { file -> tuple(get_prefix("*{R1,R2,R3}_001.fastq.gz"), file) }
+    .map { prefix, file1, file2, file3 -> tuple(get_prefix("*{R1,R2,R3}_001.fastq.gz"), file1, file2, file3) }
     .groupTuple()
     .set { fastqs_merge_paired_ch }
 
-fastqs_merge_ch  
+fastqs_merge_paired_ch.println { "\nReceived this: $it" }
+
 
 // filter out 'Undetermined' fastq files
 //fastq_output.flatMap()
