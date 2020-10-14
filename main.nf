@@ -150,8 +150,8 @@ process bcl_to_fastq {
     file sheet from sheet_file
 
     output:
-    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch mode flatten
-    set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
+    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_merge_ch mode flatten
+//  set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
 
     script:
     """
@@ -167,6 +167,13 @@ process bcl_to_fastq {
     --processing-threads $task.cpus
     """
 }
+
+fastqs_merge_ch
+    .map { file -> tuple(get_prefix("*{R1,R2,R3}_001.fastq.gz"), file) }
+    .groupTuple()
+    .set { fastqs_merge_paired_ch }
+
+fastqs_merge_ch  
 
 // filter out 'Undetermined' fastq files
 //fastq_output.flatMap()
@@ -208,7 +215,7 @@ process mergefastq {
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
     input: 
-    set val(sampleId), file(read1), file(read2), file(read3) from fastqs_merge_ch
+    set prefix, file(read1), file(read2), file(read3) from fastqs_merge_paired_ch
     
     output:
     file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch
