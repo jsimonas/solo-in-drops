@@ -225,7 +225,7 @@ process mergefastq {
     set val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
     
     output:
-    file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch
+    file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch, merged_fastqc_ch_test
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=$read2 in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
@@ -236,7 +236,7 @@ process mergefastq {
     """
 }
 
-merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+merged_fastqc_ch_test.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 
 /*
