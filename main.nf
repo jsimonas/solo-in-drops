@@ -233,9 +233,9 @@ process mergefastq {
     // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
     script:
     """
-    seqkit concat $read2 $read1 --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+    seqkit concat ${read2} ${read1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
     
-    cp $read3 ${params.outdir}/${runName}/merged_fastqc/
+    cp ${read3} ${params.outdir}/${runName}/merged_fastqc/
     
     """
 }
