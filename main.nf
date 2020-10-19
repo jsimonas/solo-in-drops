@@ -228,7 +228,7 @@ process mergefastq {
     output:
  //   file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch, merged_fastqc_ch_test
  //   set val(prefix), file('*_R21_001.fastq.gz'), file('*_R3_001.fastq.gz') into merged_fastqc_ch_test
-    set val(prefix), file('*_{R21,R3}_001.fastq.gz') into merged_fastqc_ch_test
+    set val(prefix), file('*_{R21,R3a}_001.fastq.gz') into merged_fastqc_ch_test
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
@@ -239,7 +239,7 @@ process mergefastq {
     R3 = reads[2]
     """
     seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    cp ${R3} ${params.outdir}/${runName}/merged_fastqc/
+    cp ${R3} ${prefix}_R3a_001.fastq.gz
     """
 }
 
