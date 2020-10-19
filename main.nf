@@ -217,13 +217,14 @@ process fastqc {
  */
 
 process mergefastq {
+    echo true
     tag "$prefix"
     label 'process_medium'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
-    input: 
- //    set val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
-    tuple val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
+    input:
+//    set val(prefix), file(read1: "*"), file(read2: "*"), file(read3: "*") from fastq_pairs_ch
+    set val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
     
     output:
  //   file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch, merged_fastqc_ch_test
@@ -232,11 +233,15 @@ process mergefastq {
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
+    // seqkit concat ${read2} ${read1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+    // cp ${read3} ${params.outdir}/${runName}/merged_fastqc/
     script:
     """
-    seqkit concat ${read2} ${read1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    
-    cp ${read3} ${params.outdir}/${runName}/merged_fastqc/
+    echo "${sample_ID} - \$(pwd)"
+    echo "R1 files: ${read1}"
+    echo "R2 files: ${read2}"
+    echo "R3 files: ${read3}"
+    echo "----------------"
     
     """
 }
