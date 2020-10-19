@@ -237,7 +237,7 @@ process mergefastq {
     // cp ${read3} ${params.outdir}/${runName}/merged_fastqc/
     script:
     """
-    echo "${sample_ID} - \$(pwd)"
+    echo "${prefix} - \$(pwd)"
     echo "R1 files: ${read1}"
     echo "R2 files: ${read2}"
     echo "R3 files: ${read3}"
