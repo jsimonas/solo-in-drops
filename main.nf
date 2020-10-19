@@ -223,7 +223,6 @@ process mergefastq {
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
     input:
-//    set val(prefix), file(read1: "*"), file(read2: "*"), file(read3: "*") from fastq_pairs_ch
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
@@ -233,19 +232,14 @@ process mergefastq {
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
-    // seqkit concat ${read2} ${read1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    // cp ${read3} ${params.outdir}/${runName}/merged_fastqc/
+
     script:
-    read1 = reads[0]
-    read2 = reads[1]
-    read3 = reads[2]
+    R1 = reads[0]
+    R2 = reads[1]
+    R3 = reads[2]
     """
-    echo "${prefix} - \$(pwd)"
-    echo "R1 files: ${read1}"
-    echo "R2 files: ${read2}"
-    echo "R3 files: ${read3}"
-    echo "----------------"
-    
+    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+    cp ${R3} ${params.outdir}/${runName}/merged_fastqc/
     """
 }
 
