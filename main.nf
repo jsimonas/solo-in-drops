@@ -187,9 +187,9 @@ fastqs_merge_ch.flatMap().map{ file ->
                }
             }
             .groupTuple()
-            .set{ fastq_pairs_ch }
+            .into{ fastq_pairs_ch; fastq_pairs_ch_test }
 
-fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+fastq_pairs_ch_test.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 2 - FastQC
