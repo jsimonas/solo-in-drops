@@ -151,7 +151,7 @@ process bcl_to_fastq {
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_merge_ch mode flatten
-//  set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastqs_merge_ch
+//  set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastq_output
 
     script:
     """
@@ -169,13 +169,13 @@ process bcl_to_fastq {
 }
 
 // filter out 'Undetermined' fastq files
-//fastq_output.flatMap()
-//            .map{ item ->
-//                if (! "${item}".contains("Undetermined_")){
-//                    return item
-//                }
-//            }
-//            .set{ fastq_filtered }
+fastq_output.flatMap()
+            .map{ item ->
+                if (! "${item}".contains("Undetermined_")){
+                    return item
+                }
+            }
+            .set{ fastqs_merge_ch }
 
 
 // make paired channel for fastqs
