@@ -150,8 +150,7 @@ process bcl_to_fastq {
     file sheet from sheet_file
 
     output:
-    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_merge_ch mode flatten
-//  set val(sampleId), file("*{R1,R2,R3}_001.fastq.gz") into fastq_output
+    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
 
     script:
     """
@@ -167,29 +166,6 @@ process bcl_to_fastq {
     --processing-threads $task.cpus
     """
 }
-
-// filter out 'Undetermined' fastq files
-fastq_output.flatMap()
-            .map{ item ->
-                if (! "${item}".contains("Undetermined_")){
-                    return item
-                }
-            }
-            .set{ fastqs_merge_ch }
-
-
-// make paired channel for fastqs
-fastqs_merge_ch.flatMap().map{ file ->
-               if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_")){
-                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
-                    def key = key_match[0][1]
-                    return tuple(key, file)
-               }
-            }
-            .groupTuple()
-            .into{ fastq_pairs_ch; fastq_pairs_ch_test }
-
-fastq_pairs_ch_test.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 2 - FastQC
@@ -212,6 +188,27 @@ process fastqc {
     """
 }
 
+// filter out 'Undetermined' fastq files
+fastqs_output_ch.flatMap()
+            .map{ item ->
+                if (! "${item}".contains("Undetermined_")){
+                    return item
+                }
+            }
+            .set{ fastqs_filtered_ch }
+
+
+// make paired channel for fastqs
+fastqs_filtered_ch.flatMap().map{ file ->
+               if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_")){
+                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
+                    def key = key_match[0][1]
+                    return tuple(key, file)
+               }
+            }
+            .groupTuple()
+            .set{ fastq_pairs_ch }
+
 /*
  * STEP 3 - Merge FASTQ
  */
@@ -226,9 +223,7 @@ process mergefastq {
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
- //   file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch, merged_fastqc_ch_test
- //   set val(prefix), file('*_R21_001.fastq.gz'), file('*_R3_001.fastq.gz') into merged_fastqc_ch_test
-    set val(prefix), file('*_{R21,R3a}_001.fastq.gz') into merged_fastqc_ch_test
+    set val(prefix), file('*_{R21,R3a}_001.fastq.gz') into merged_fastqc_ch
     
     // TODO: for rev complements, it will be introduced thru parameter
     // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
@@ -243,7 +238,7 @@ process mergefastq {
     """
 }
 
-merged_fastqc_ch_test.subscribe onNext: { println it }, onComplete: { println 'Done' }
+merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 
 /*
