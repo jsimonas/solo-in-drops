@@ -223,8 +223,8 @@ process mergefastq {
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
     input:
-//    set val(prefix), file(read1: "*"), file(read2: "*"), file(read3: "*") from fastq_pairs_ch
-    set val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
+    set val(prefix), file(read1: "*"), file(read2: "*"), file(read3: "*") from fastq_pairs_ch
+//    set val(prefix), file(read1), file(read2), file(read3) from fastq_pairs_ch
     
     output:
  //   file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch, merged_fastqc_ch_test
