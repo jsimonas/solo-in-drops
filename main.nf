@@ -189,7 +189,7 @@ fastqs_merge_ch.flatMap().map{ file ->
             .groupTuple()
             .set{ fastq_pairs_ch }
 
-//fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+fastq_pairs_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 2 - FastQC
@@ -217,7 +217,7 @@ process fastqc {
  */
 
 process mergefastq {
-    tag "$sampleId"
+    tag "$prefix"
     label 'process_medium'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     
@@ -228,10 +228,10 @@ process mergefastq {
     file "*_{R21,R3}_001.fastq.gz" into merged_fastqc_ch
     
     // TODO: for rev complements, it will be introduced thru parameter
-    // fuse.sh in1=$read2 in2=$read1 out=${id}_merged.fastq.gz fusepairs pad=0
+    // fuse.sh in1=$read2 in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
     script:
     """
-    seqkit concat $read2 $read1 > ${sampleId}_R21_001.fastq.gz --threads $task.cpus
+    seqkit concat $read2 $read1 > ${prefix}_R21_001.fastq.gz --threads $task.cpus
     cp $read3 ${params.outdir}/${runName}/merged_fastqc/
     """
 }
