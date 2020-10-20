@@ -266,7 +266,7 @@ process mergefastq {
     }
 }
 
-//merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+// merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - STARsolo
@@ -281,15 +281,13 @@ process starsolo {
     file whitelist from barcode_whitelist.collect()
 
     output:
-    set file("*Log.final.out"), file ('*.bam') into star_aligned
-    file "*.out" into alignment_logs
-    file "*SJ.out.tab"
-    file "*Log.out" into star_log
-    file "${prefix}Aligned.sortedByCoord.out.bam.bai"
+//    file "*.out" into alignment_logs
+//    file "*SJ.out.tab"
+//    file "*/Solo.out"
 
     script:
-    prefix = reads[0].toString() -~ /(.+)_cb\d+_001\.fastq\.gz/
-    
+    prefix = reads[0].toString() - ~/(_R1)?(\.fastq)?(\.gz)?$/
+
     bc_read = reads[0]
     cdna_read = reads[1]
     """
@@ -310,9 +308,10 @@ process multiqc {
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file ('software_versions/*') from ch_software_versions_yaml.collect()
+    file ('alignment/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
-
+    file ('software_versions/*') from ch_software_versions_yaml.collect()
+    
     output:
     file "*multiqc_report.html" into ch_multiqc_report
     file "*_data"
@@ -329,7 +328,7 @@ process multiqc {
 }
 
 /*
- * STEP 4 - Output Description HTML
+ * STEP 6 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
