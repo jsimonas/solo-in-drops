@@ -23,7 +23,7 @@ def helpMessage() {
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
       --sample_sheet [file]           Full path to to the sample sheet file
-      --sequencer                     Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq"
+      --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq"
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker and singularity
 
@@ -61,7 +61,7 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists: true) } else { exit 1, "Sample sheet not found!" }
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
 
-// TODO: properly add sequencer validation
+// TODO: properly add sequencer validation 
 //if (params.sequencer != 'nextseq' || params.sequencer != 'novaseq' || params.sequencer != 'hiseq' || params.sequencer != 'miseq' ){
 //    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
 //    }
@@ -69,11 +69,9 @@ if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else 
 runName = runDir.getName()
 
 //Check STAR index
-//if( params.star_index ){
-//    star_index = Channel
-//        .fromPath(params.star_index)
-//        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
-//}
+//if( params.star_index ){ star_index = Channel.fromPath( params.star_index ).ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }}
+if (params.star_index) { star_index = file(params.star_index, checkIfExists: true) } else { exit 1, "STAR index not found: ${params.star_index}" }
+
 
 //Check barcode whitelist
 if( params.barcode_whitelist ){
