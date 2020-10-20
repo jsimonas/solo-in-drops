@@ -235,15 +235,16 @@ process mergefastq {
     R3 = reads[2]
     
     if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
+    //    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+    //    cp ${R3} ${prefix}_R3a_001.fastq.gz
     """
-//    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-//    cp ${R3} ${prefix}_R3a_001.fastq.gz
     echo "miseq & hiseq"
     """
     } else {
+    //    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+    //    cp ${R3} ${prefix}_R3a_001.fastq.gz
+
     """
-//    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-//    cp ${R3} ${prefix}_R3a_001.fastq.gz
     echo "nextseq"
     """
     }
