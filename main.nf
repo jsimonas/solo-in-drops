@@ -193,7 +193,6 @@ process bcl_to_fastq {
 /*
  * STEP 2 - FastQC
  */
-
 process fastqc {
     tag "$fastq"
     label 'process_medium'
@@ -234,7 +233,6 @@ fastqs_filtered_ch.flatMap().map{ file ->
 /*
  * STEP 3 - Merge FASTQ
  */
-
 process mergefastq {
     tag "$prefix"
     label 'process_medium'
