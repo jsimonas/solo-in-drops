@@ -295,19 +295,18 @@ process starsolo {
     echo ${bc_read}
     echo ${cdna_read}
     
-#    STAR --genomeDir ${index} \\
-#          --readFilesIn ${bc_read} ${cdna_read} \\
-#          --runThreadN ${task.cpus} \\
-#          --twopassMode Basic \\
-#          --outWigType bedGraph \\
-#          --outSAMtype BAM SortedByCoordinate $avail_mem \\
-#          --readFilesCommand zcat \\
-#          --runDirPerm All_RWX \\
-#          --outFileNamePrefix ${prefix} \\
-#          --soloType Droplet \\
-#          --soloCBwhitelist ${whitelist}
     """
 }
+
+//    STAR --genomeDir ${index} \\
+//          --readFilesIn ${bc_read} ${cdna_read} \\
+//          --runThreadN ${task.cpus} \\
+//          --twopassMode Basic \\
+//          --outWigType bedGraph \\
+//          --readFilesCommand zcat \\
+//          --outFileNamePrefix ${prefix} \\
+//          --soloType Droplet \\
+//          --soloCBwhitelist ${whitelist}
 
 /*
  * STEP 5 - MultiQC
