@@ -60,9 +60,11 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 // Validate mandatory inputs
 if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists: true) } else { exit 1, "Sample sheet not found!" }
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
-if (params.sequencer != 'nextseq' || params.sequencer != 'novaseq' || params.sequencer != 'hiseq' || params.sequencer != 'miseq' ){
-    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
-    }
+
+// TODO: properly add sequencer validation
+//if (params.sequencer != 'nextseq' || params.sequencer != 'novaseq' || params.sequencer != 'hiseq' || params.sequencer != 'miseq' ){
+//    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
+//    }
 
 runName = runDir.getName()
 
