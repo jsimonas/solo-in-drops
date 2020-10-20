@@ -286,7 +286,7 @@ process starsolo {
 //    file "*/Solo.out"
 
     script:
-    prefix = reads[0].toString() - ~/(_R1)?(\.fastq)?(\.gz)?$/
+    prefix = reads[0].toString() - ~/(_bc)?(\.fastq)?(\.gz)?$/
 
     bc_read = reads[0]
     cdna_read = reads[1]
