@@ -224,7 +224,7 @@ process mergefastq {
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
-    set val(prefix), file('*_{R12,R3}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), file('*_{R21,R3}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
@@ -233,12 +233,12 @@ process mergefastq {
     
     if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
     """
-    seqkit concat ${R1} ${R2} --out-file ${prefix}_R12_001.fastq.gz --threads $task.cpus
+    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
     cp ${R3} ${prefix}_R3_001.fastq.gz
     """
     } else {
     """    
-    seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R1}) ${R2} \
+    seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
     --out-file ${prefix}_R21_001.fastq.gz \
     --threads $task.cpus
     
