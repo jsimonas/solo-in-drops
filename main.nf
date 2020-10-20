@@ -241,17 +241,33 @@ process mergefastq {
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
     --out-file ${prefix}_R21_001.fastq.gz \
     --threads $task.cpus
-    
-    cp ${R3} ${prefix}_R3_001.fastq.gz
     """
     }
 }
 
+// cp ${R3} ${prefix}_R3_001.fastq.gz
+
 merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
+/*
+ * STEP 4 - STARsolo
+ */
+//process multiqc {
+//    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
+
+//    input:
+    
+//    output:
+    
+//    script:
+    
+//    """
+    
+//    """
+//}
 
 /*
- * STEP 4 - MultiQC
+ * STEP 5 - MultiQC
  */
 process multiqc {
     publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
