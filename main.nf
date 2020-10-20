@@ -224,28 +224,25 @@ process mergefastq {
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
-    set val(prefix), file('*_{R21,R3a}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), file('*_{R12,R3}_001.fastq.gz') into merged_fastqc_ch
     
-    // TODO: for rev complements, it will be introduced thru parameter
-    // fuse.sh in1=${$read2} in2=$read1 out=${prefix}_merged.fastq.gz fusepairs pad=0
-
     script:
     R1 = reads[0]
     R2 = reads[1]
     R3 = reads[2]
     
     if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
-    //    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    //    cp ${R3} ${prefix}_R3a_001.fastq.gz
     """
-    echo "miseq & hiseq"
+    seqkit concat ${R1} ${R2} --out-file ${prefix}_R12_001.fastq.gz --threads $task.cpus
+    cp ${R3} ${prefix}_R3_001.fastq.gz
     """
     } else {
-    //    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    //    cp ${R3} ${prefix}_R3a_001.fastq.gz
-
-    """
-    echo "nextseq"
+    """    
+    seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R1}) ${R2} \
+    --out-file ${prefix}_R21_001.fastq.gz \
+    --threads $task.cpus
+    
+    cp ${R3} ${prefix}_R3_001.fastq.gz
     """
     }
 }
