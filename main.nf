@@ -23,6 +23,7 @@ def helpMessage() {
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
       --sample_sheet [file]           Full path to to the sample sheet file
+      --sequencer                     Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "hiseq", "miseq" or "hiseq"
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker and singularity
 
@@ -232,10 +233,20 @@ process mergefastq {
     R1 = reads[0]
     R2 = reads[1]
     R3 = reads[2]
+    
+    if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
     """
-    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    cp ${R3} ${prefix}_R3a_001.fastq.gz
+//    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+//    cp ${R3} ${prefix}_R3a_001.fastq.gz
+    echo "miseq & hiseq"
     """
+    } else {
+    """
+//    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
+//    cp ${R3} ${prefix}_R3a_001.fastq.gz
+    echo "nextseq"
+    """
+    }
 }
 
 merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
