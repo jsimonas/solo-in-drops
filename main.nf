@@ -61,7 +61,7 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists: true) } else { exit 1, "Sample sheet not found!" }
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
 
-// TODO: properly add sequencer validation 
+// TODO: properly add sequencer validation
 //if (params.sequencer != 'nextseq' || params.sequencer != 'novaseq' || params.sequencer != 'hiseq' || params.sequencer != 'miseq' ){
 //    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
 //    }
@@ -69,9 +69,11 @@ if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else 
 runName = runDir.getName()
 
 //Check STAR index
-//if( params.star_index ){ star_index = Channel.fromPath( params.star_index ).ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }}
-if (params.star_index) { star_index = file(params.star_index, checkIfExists: true) } else { exit 1, "STAR index not found: ${params.star_index}" }
-
+if( params.star_index ){
+    star_index = Channel
+        .fromPath(params.star_index)
+        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+}
 
 //Check barcode whitelist
 if( params.barcode_whitelist ){
@@ -277,7 +279,7 @@ process starsolo {
 
     input:
     set val(prefix), file(reads) from merged_fastqc_ch
-//    file index from star_index.collect()
+    file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
     output:
@@ -292,9 +294,9 @@ process starsolo {
     
     """
     STAR \\
-    --genomeDir ${star_index} \\
+    --genomeDir ${index} \\
     --readFilesIn ${cdna_read} ${bc_read} \\
-    --soloCBwhitelist ${whitelist}
+    --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix} \\
     --twopassMode Basic \\
@@ -304,7 +306,7 @@ process starsolo {
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM_multi_pseudocounts  
+    --soloCBmatchWLtype 1MM_multi_pseudocounts    
     """
 }
 
