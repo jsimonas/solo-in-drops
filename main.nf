@@ -234,7 +234,6 @@ fastqs_filtered_ch.flatMap().map{ file ->
  */
 
 process mergefastq {
-    echo true
     tag "$prefix"
     label 'process_medium'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
@@ -252,11 +251,13 @@ process mergefastq {
     
     if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
     """
+    echo $params.sequencer
     seqkit concat ${R2} ${R1} --out-file ${prefix}_bc_001.fastq.gz --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     } else {
-    """    
+    """
+    echo $params.sequencer
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
     --out-file ${prefix}_bc_001.fastq.gz \
     --threads $task.cpus
@@ -265,29 +266,38 @@ process mergefastq {
     }
 }
 
-merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+//merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - STARsolo
  */
-//process starsolo {
-//    publishDir "${params.outdir}/${runName}/starsolo", mode: 'copy'
+process starsolo {
+    echo true
+    publishDir "${params.outdir}/${runName}/starsolo", mode: 'copy'
 
-//    input:
-//    set val(prefix), file(reads) from merged_fastqc_ch
-//    file index from star_index.collect()
-//    file whitelist from barcode_whitelist.collect()
+    input:
+    set val(prefix), file(reads) from merged_fastqc_ch
+    file index from star_index.collect()
+    file whitelist from barcode_whitelist.collect()
 
-    
-//    output:
-//
+    output:
+    set file("*Log.final.out"), file ('*.bam') into star_aligned
+    file "*.out" into alignment_logs
+    file "*SJ.out.tab"
+    file "*Log.out" into star_log
+    file "${prefix}Aligned.sortedByCoord.out.bam.bai"
 
-//    script:
+    script:
+    prefix = reads[0].toString() -~ /(.+)_cb\d+_001\.fastq\.gz/
     
-//    """
-    
-//    """
-//}
+    bc_read = reads[0]
+    cdna_read = reads[1]
+    """
+    echo ${prefix}
+    echo ${bc_read}
+    echo ${cdna_read}
+    """
+}
 
 /*
  * STEP 5 - MultiQC
