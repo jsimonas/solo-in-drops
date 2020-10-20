@@ -286,7 +286,7 @@ process starsolo {
 //    file "*/Solo.out"
 
     script:
-    prefix = reads[0].toString() - ~/(_bc)?(\.fastq)?(\.gz)?$/
+    prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
 
     bc_read = reads[0]
     cdna_read = reads[1]
@@ -294,6 +294,18 @@ process starsolo {
     echo ${prefix}
     echo ${bc_read}
     echo ${cdna_read}
+    
+#    STAR --genomeDir ${index} \\
+#          --readFilesIn ${bc_read} ${cdna_read} \\
+#          --runThreadN ${task.cpus} \\
+#          --twopassMode Basic \\
+#          --outWigType bedGraph \\
+#          --outSAMtype BAM SortedByCoordinate $avail_mem \\
+#          --readFilesCommand zcat \\
+#          --runDirPerm All_RWX \\
+#          --outFileNamePrefix ${prefix} \\
+#          --soloType Droplet \\
+#          --soloCBwhitelist ${whitelist}
     """
 }
 
