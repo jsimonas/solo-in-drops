@@ -69,11 +69,11 @@ if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else 
 runName = runDir.getName()
 
 //Check STAR index
-if( params.star_index ){
-    star_index = Channel
-        .fromPath(params.star_index)
-        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
-}
+//if( params.star_index ){
+//    star_index = Channel
+//        .fromPath(params.star_index)
+//        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+//}
 
 //Check barcode whitelist
 if( params.barcode_whitelist ){
@@ -279,7 +279,7 @@ process starsolo {
 
     input:
     set val(prefix), file(reads) from merged_fastqc_ch
-    file index from star_index.collect()
+//    file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
     output:
@@ -294,7 +294,7 @@ process starsolo {
     
     """
     STAR \\
-    --genomeDir $index \\
+    --genomeDir ${star_index} \\
     --readFilesIn ${cdna_read} ${bc_read} \\
     --soloCBwhitelist ${whitelist}
     --runThreadN ${task.cpus} \\
@@ -306,7 +306,7 @@ process starsolo {
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM_multi_pseudocounts    
+    --soloCBmatchWLtype 1MM_multi_pseudocounts  
     """
 }
 
