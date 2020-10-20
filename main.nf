@@ -308,7 +308,7 @@ process multiqc {
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file ('alignment/*') from alignment_logs.collect().ifEmpty([])
+//     file ('starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
     
