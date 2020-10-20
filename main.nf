@@ -152,9 +152,11 @@ process get_software_versions {
     """
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
-    bcl2fastq --version > v_bcl2fastq.txt
-    STAR --version > v_STAR.txt
-    multiqc --version > v_multiqc.txt
+    STAR --version &> v_star.txt 2>&1 || true
+    samtools --version &> v_samtools.txt || true
+    bcl2fastq --version &> v_bcl2fastq.txt || true
+    seqkit version &> v_seqkit.txt || true
+    multiqc --version &> v_multiqc.txt || true
     scrape_software_versions.py &> software_versions_mqc.yaml
     """
 }
@@ -281,32 +283,32 @@ process starsolo {
     file whitelist from barcode_whitelist.collect()
 
     output:
-//    file "*.out" into alignment_logs
-//    file "*SJ.out.tab"
-//    file "*/Solo.out"
+    file "*.out" into alignment_logs
+    file "*SJ.out.tab"
+    file "*/Solo.out"
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
-
     bc_read = reads[0]
     cdna_read = reads[1]
-    """
-    echo ${prefix}
-    echo ${bc_read}
-    echo ${cdna_read}
     
     """
+    STAR \\
+    --genomeDir ${index} \\
+    --readFilesIn ${cdna_read} ${bc_read} \\
+    --soloCBwhitelist ${whitelist}
+    --runThreadN ${task.cpus} \\
+    --outFileNamePrefix ${prefix} \\
+    --twopassMode Basic \\
+    --runDirPerm All_RWX \\
+    --outWigType bedGraph \\
+    --readFilesCommand zcat \\
+    --soloType CB_UMI_Simple \\
+    --soloUMIlen 8 \\
+    --soloUMIfiltering MultiGeneUMI \\
+    --soloCBmatchWLtype 1MM_multi_pseudocounts    
+    """
 }
-
-//    STAR --genomeDir ${index} \\
-//          --readFilesIn ${bc_read} ${cdna_read} \\
-//          --runThreadN ${task.cpus} \\
-//          --twopassMode Basic \\
-//          --outWigType bedGraph \\
-//          --readFilesCommand zcat \\
-//          --outFileNamePrefix ${prefix} \\
-//          --soloType Droplet \\
-//          --soloCBwhitelist ${whitelist}
 
 /*
  * STEP 5 - MultiQC
@@ -319,7 +321,7 @@ process multiqc {
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-//     file ('starsolo/*') from alignment_logs.collect().ifEmpty([])
+    file ('starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
     
