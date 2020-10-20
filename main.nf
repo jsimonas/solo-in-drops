@@ -301,7 +301,6 @@ process starsolo {
     --outFileNamePrefix ${prefix} \\
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
-    --outWigType bedGraph \\
     --readFilesCommand zcat \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
