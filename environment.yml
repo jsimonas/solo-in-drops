@@ -16,6 +16,7 @@ dependencies:
   - bioconda::fastqc=0.11.8
   - bioconda::multiqc=1.7
   - bioconda::star=2.7.6a
+  - bioconda::samtools=1.11
   - bioconda::seqkit=0.13.2
   - bioconda::bbmap=38.87
   - Freenome::bcl2fastq=2.20

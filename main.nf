@@ -23,7 +23,7 @@ def helpMessage() {
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
       --sample_sheet [file]           Full path to to the sample sheet file
-      --sequencer                     Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "hiseq", "miseq" or "hiseq"
+      --sequencer                     Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq"
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker and singularity
 
@@ -57,9 +57,13 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
     custom_runName = workflow.runName
 }
 
-// Validate inputs
+// Validate mandatory inputs
 if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists: true) } else { exit 1, "Sample sheet not found!" }
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
+if (params.sequencer != "nextseq" || params.sequencer != "novaseq" || params.sequencer != "hiseq" || params.sequencer != "miseq" ){
+    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
+    }
+
 runName = runDir.getName()
 
 //Check STAR index
@@ -212,7 +216,6 @@ fastqs_output_ch.flatMap()
             }
             .set{ fastqs_filtered_ch }
 
-
 // make paired channel for fastqs
 fastqs_filtered_ch.flatMap().map{ file ->
                if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_")){
@@ -238,7 +241,7 @@ process mergefastq {
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
-    set val(prefix), file('*_{bc,cDNA}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
@@ -255,7 +258,6 @@ process mergefastq {
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
     --out-file ${prefix}_bc_001.fastq.gz \
     --threads $task.cpus
-    
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     }
@@ -271,6 +273,9 @@ merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' 
 
 //    input:
 //    set val(prefix), file(reads) from merged_fastqc_ch
+//    file index from star_index.collect()
+//    file whitelist from barcode_whitelist.collect()
+
     
 //    output:
 //
