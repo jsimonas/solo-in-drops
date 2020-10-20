@@ -62,6 +62,20 @@ if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists:
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
 runName = runDir.getName()
 
+//Check STAR index
+if( params.star_index ){
+    star_index = Channel
+        .fromPath(params.star_index)
+        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+}
+
+//Check barcode whitelist
+if( params.barcode_whitelist ){
+    barcode_whitelist = Channel
+        .fromPath(params.barcode_whitelist)
+        .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+}
+
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
@@ -224,7 +238,7 @@ process mergefastq {
     set val(prefix), file(reads) from fastq_pairs_ch
     
     output:
-    set val(prefix), file('*_{R21,R3}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), file('*_{bc,cDNA}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
@@ -233,32 +247,34 @@ process mergefastq {
     
     if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
     """
-    seqkit concat ${R2} ${R1} --out-file ${prefix}_R21_001.fastq.gz --threads $task.cpus
-    cp ${R3} ${prefix}_R3_001.fastq.gz
+    seqkit concat ${R2} ${R1} --out-file ${prefix}_bc_001.fastq.gz --threads $task.cpus
+    cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     } else {
     """    
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
-    --out-file ${prefix}_R21_001.fastq.gz \
+    --out-file ${prefix}_bc_001.fastq.gz \
     --threads $task.cpus
+    
+    cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     }
 }
-
-// cp ${R3} ${prefix}_R3_001.fastq.gz
 
 merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - STARsolo
  */
-//process multiqc {
-//    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
+//process starsolo {
+//    publishDir "${params.outdir}/${runName}/starsolo", mode: 'copy'
 
 //    input:
+//    set val(prefix), file(reads) from merged_fastqc_ch
     
 //    output:
-    
+//
+
 //    script:
     
 //    """
