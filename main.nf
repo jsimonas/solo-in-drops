@@ -272,6 +272,8 @@ process mergefastq {
  * STEP 4 - STARsolo
  */
 process starsolo {
+    tag "$prefix"
+    label 'high_memory'
     echo true
     publishDir "${params.outdir}/${runName}/starsolo", mode: 'copy'
 
@@ -292,7 +294,7 @@ process starsolo {
     
     """
     STAR \\
-    --genomeDir ${index} \\
+    --genomeDir $index \\
     --readFilesIn ${cdna_read} ${bc_read} \\
     --soloCBwhitelist ${whitelist}
     --runThreadN ${task.cpus} \\
