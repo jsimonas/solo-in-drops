@@ -285,7 +285,7 @@ process starsolo {
     output:
     file "*.out" into alignment_logs
     file "*SJ.out.tab"
-    file "*/Solo.out"
+    file "*Solo.out"
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
