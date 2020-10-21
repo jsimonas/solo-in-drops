@@ -95,6 +95,9 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
+summary['Sequencer']        = params.sequencer
+summary['STAR index']       = params.star_index
+summary['CB whitelist']     = params.barcode_whitelist
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if (workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
@@ -237,6 +240,7 @@ process mergefastq {
     tag "$prefix"
     label 'process_medium'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
+    echo true
     
     input:
     set val(prefix), file(reads) from fastq_pairs_ch
@@ -274,8 +278,8 @@ process mergefastq {
 process starsolo {
     tag "$prefix"
     label 'high_memory'
-    echo true
     publishDir "${params.outdir}/${runName}/starsolo/$prefix", mode: 'copy'
+    echo true
 
     input:
     set val(prefix), file(reads) from merged_fastqc_ch
