@@ -302,7 +302,7 @@ process starsolo {
     --readFilesIn ${cdna_read} ${bc_read} \\
     --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
-    --outFileNamePrefix ${prefix} \\
+    --outFileNamePrefix ${prefix}_ \\
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
