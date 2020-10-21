@@ -275,7 +275,7 @@ process starsolo {
     tag "$prefix"
     label 'high_memory'
     echo true
-    publishDir "${params.outdir}/${runName}/starsolo", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/starsolo/$prefix", mode: 'copy'
 
     input:
     set val(prefix), file(reads) from merged_fastqc_ch
