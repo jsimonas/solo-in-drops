@@ -277,7 +277,7 @@ process mergefastq {
  */
 process starsolo {
     tag "$prefix"
-    label 'high_memory'
+    label 'process_high'
     publishDir "${params.outdir}/${runName}/starsolo/$prefix", mode: 'copy'
     echo true
 
