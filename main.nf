@@ -287,7 +287,9 @@ process starsolo {
     file whitelist from barcode_whitelist.collect()
 
     output:
+    file "*.sorted.bam"
     file "*.out" into alignment_logs
+    file "*Solo.out/Gene/Summary.csv" into starsolo_logs
     file "*SJ.out.tab"
     file "*Solo.out"
 
@@ -303,9 +305,15 @@ process starsolo {
     --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
+    --sjdbOverhang 100 \\
+    --outSAMunmapped Within \\
+    --outSAMtype BAM SortedByCoordinate \\
+    --outBAMsortingBinsN 20 \\
+    --outSAMattributes NH HI AS nM CB UB \\
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
+    --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloUMIfiltering MultiGeneUMI \\
@@ -324,7 +332,8 @@ process multiqc {
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file ('starsolo/*') from alignment_logs.collect().ifEmpty([])
+    file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    file (starsolo:'starsolo/*') from starsolo_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
     
