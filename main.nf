@@ -287,7 +287,7 @@ process starsolo {
     file whitelist from barcode_whitelist.collect()
 
     output:
-    file "*.sorted.bam"
+    file "*.bam"
     file "*.out" into alignment_logs
     file "*Solo.out/Gene/Summary.csv" into starsolo_logs
     file "*SJ.out.tab"
