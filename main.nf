@@ -289,7 +289,7 @@ process starsolo {
     output:
     file "*.bam"
     file "*.out" into alignment_logs
-    file "*Solo.out/Gene/Summary.csv" into starsolo_logs
+//    file "*Solo.out/Gene/${prefix}_Summary.csv" into starsolo_logs
     file "*SJ.out.tab"
     file "*Solo.out"
 
@@ -317,7 +317,10 @@ process starsolo {
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM_multi_pseudocounts    
+    --soloCBmatchWLtype 1MM_multi_pseudocounts
+    
+    #mv "*Solo.out/Gene/Summary.csv" "*Solo.out/Gene/${prefix}_Summary.csv"
+    
     """
 }
 
