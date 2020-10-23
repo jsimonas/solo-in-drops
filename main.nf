@@ -238,7 +238,7 @@ fastqs_filtered_ch.flatMap().map{ file ->
  */
 process mergefastq {
     tag "$prefix"
-    label 'process_medium'
+    label 'process_high'
     publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
     echo true
     
@@ -289,7 +289,7 @@ process starsolo {
     output:
     file "*.bam"
     file "*.out" into alignment_logs
-//    file "*Solo.out/Gene/${prefix}_Summary.csv" into starsolo_logs
+    file "${prefix}_Gene_Summary.csv" into starsolo_logs
     file "*SJ.out.tab"
     file "*Solo.out"
 
@@ -319,7 +319,7 @@ process starsolo {
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts
     
-    #mv "*Solo.out/Gene/Summary.csv" "*Solo.out/Gene/${prefix}_Summary.csv"
+    cp "*Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
     """
 }
@@ -336,7 +336,7 @@ process multiqc {
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
     file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
- //   file (starsolo:'starsolo/*') from starsolo_logs.collect().ifEmpty([])
+    file (starsolo:'starsolo/*') from starsolo_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
     
