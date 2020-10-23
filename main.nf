@@ -23,7 +23,7 @@ def helpMessage() {
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
       --sample_sheet [file]           Full path to to the sample sheet file
-      --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq"
+      --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker and singularity
 
@@ -253,15 +253,13 @@ process mergefastq {
     R2 = reads[1]
     R3 = reads[2]
     
-    if (params.sequencer == "miseq" || params.sequencer == "hiseq" ){
+    if ( params.sequencer != "nextseq" ){
     """
-    echo $params.sequencer
     seqkit concat ${R2} ${R1} --out-file ${prefix}_bc_001.fastq.gz --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     } else {
     """
-    echo $params.sequencer
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
     --out-file ${prefix}_bc_001.fastq.gz \
     --threads $task.cpus
