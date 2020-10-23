@@ -317,7 +317,7 @@ process starsolo {
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts
     
-    cp "*Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
+    cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
     """
 }
