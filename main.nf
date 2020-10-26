@@ -314,6 +314,7 @@ process starsolo {
     --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
+    --soloBarcodeReadLength 24 \\
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts
     
