@@ -29,7 +29,7 @@ def helpMessage() {
 
     References:                       If not specified in the configuration file or you wish to overwrite any of the references
       --star_index [path/to/folder]   Path to star index directory (same as --genomeDir parameter in STAR)
-      --barcode_whitelist [file]      Path to genome fasta file
+      --barcode_whitelist [file]      Path to cell barcode list (a text file containing one barcode sequence per line)
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved
