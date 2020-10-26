@@ -255,13 +255,17 @@ process mergefastq {
     
     if ( params.sequencer != "nextseq" ){
     """
-    seqkit concat ${R2} ${R1} --out-file ${prefix}_bc_001.fastq.gz --threads $task.cpus
+    seqkit concat ${R2} ${R1} \\
+    --out-file ${prefix}_bc_001.fastq.gz \\
+    --line-width 0 \\
+    --threads $task.cpus \\
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     } else {
     """
-    seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \
-    --out-file ${prefix}_bc_001.fastq.gz \
+    seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \\
+    --out-file ${prefix}_bc_001.fastq.gz \\
+    --line-width 0 \\
     --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
@@ -314,7 +318,7 @@ process starsolo {
     --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
-    --soloBarcodeReadLength 60 \\
+    --soloBarcodeReadLength 68 \\
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts
     
