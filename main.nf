@@ -258,7 +258,7 @@ process mergefastq {
     seqkit concat ${R2} ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
     --line-width 0 \\
-    --threads $task.cpus \\
+    --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     } else {
