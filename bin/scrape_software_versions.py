@@ -9,11 +9,19 @@ regexes = {
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
+    'STAR': ['v_star.txt', r"STAR, version (\S+)"],
+    'SAMtools': ['v_samtools.txt', r"SAMtools, version (\S+)"],
+    'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq, version (\S+)"],
+    'SeqKit': ['v_seqkit.txt', r"SeqKit, version (\S+)"],
 }
 results = OrderedDict()
 results['jsimonas/solo-in-drops'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
+results['bcl2fastq'] = '<span style="color:#999999;\">N/A</span>'
 results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
+results['SeqKit'] = '<span style="color:#999999;\">N/A</span>'
+results['STAR'] = '<span style="color:#999999;\">N/A</span>'
+results['SAMtools'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
 
 # Search each file using its regex
