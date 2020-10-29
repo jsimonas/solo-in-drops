@@ -30,6 +30,9 @@ def helpMessage() {
     References:                       If not specified in the configuration file or you wish to overwrite any of the references
       --star_index [path/to/folder]   Path to star index directory (same as --genomeDir parameter in STAR)
       --barcode_whitelist [file]      Path to cell barcode list (a text file containing one barcode sequence per line)
+    
+    STARsolo arguments:               If not specified, the default parameters will be used
+      --bc_read_length [int]          Read length of cell barcode read. Default: 24 (BC + UMI)      
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved
@@ -319,7 +322,7 @@ process starsolo {
     --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
-    --soloBarcodeReadLength 68 \\
+    --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts
     
