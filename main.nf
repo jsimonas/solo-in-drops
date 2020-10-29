@@ -32,7 +32,7 @@ def helpMessage() {
       --barcode_whitelist [file]      Path to cell barcode list (a text file containing one barcode sequence per line)
     
     STARsolo arguments:               If not specified, the default parameters will be used
-      --bc_read_length [int]          Read length of cell barcode read. Default: 24 (BC + UMI)      
+      --bc_read_length [int]          Read length of cell barcode read. Default: equal to sum of BC + UMI     
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved
@@ -319,6 +319,8 @@ process starsolo {
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
+    --outFilterScoreMinOverLread 0.6 \\ 
+    --outFilterMatchNminOverLread 0.6 \\
     --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
