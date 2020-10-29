@@ -325,7 +325,7 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM_multi_pseudocounts \\
-    --outFilterMatchNmin 50 
+    --outFilterMatchNmin 30 
     
     cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
