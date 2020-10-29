@@ -319,7 +319,8 @@ process starsolo {
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
-    --outFilterMatchNmin 50 \\ 
+    --outFilterScoreMinOverLread 0.5 \\ 
+    --outFilterMatchNminOverLread 0.5 \\
     --soloFeatures Gene Velocyto \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
