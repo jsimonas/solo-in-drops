@@ -324,7 +324,7 @@ process starsolo {
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM_multi_pseudocounts \\
+    --soloCBmatchWLtype Exact \\
     --outFilterMatchNmin 0 \\
     --outFilterScoreMinOverLread 0.5 \\
     --outFilterMatchNminOverLread 0.5
