@@ -24,6 +24,7 @@ def helpMessage() {
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
       --sample_sheet [file]           Full path to to the sample sheet file
       --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
+      --mode [str]                    STAR alignment mode. Default: "cell". Can be set as "bacteria" to switch off splice alignments.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker and singularity
 
@@ -104,6 +105,7 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
 summary['Sequencer']        = params.sequencer
+summary['Aligment mode']    = params.mode
 summary['STAR index']       = params.star_index
 summary['CB whitelist']     = params.barcode_whitelist
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
@@ -309,6 +311,7 @@ process starsolo {
     bc_read = reads[0]
     cdna_read = reads[1]
     
+    if ( params.mode != "cell" ){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -316,7 +319,32 @@ process starsolo {
     --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
-    --sjdbOverhang 100 \\
+    --alignIntronMax 1 \\
+    --outSAMunmapped Within \\
+    --outSAMtype BAM SortedByCoordinate \\
+    --outBAMsortingBinsN 20 \\
+    --outSAMattributes NH HI AS nM CB UB \\
+    --twopassMode Basic \\
+    --runDirPerm All_RWX \\
+    --readFilesCommand zcat \\
+    --soloFeatures Gene \\
+    --soloType CB_UMI_Simple \\
+    --soloUMIlen 8 \\
+    --soloBarcodeReadLength ${params.bc_read_length} \\
+    --soloUMIfiltering MultiGeneUMI \\
+    --soloCBmatchWLtype 1MM 
+    
+    cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
+    
+    """
+    } else {
+    """
+    STAR \\
+    --genomeDir ${index} \\
+    --readFilesIn ${cdna_read} ${bc_read} \\
+    --soloCBwhitelist ${whitelist} \\
+    --runThreadN ${task.cpus} \\
+    --outFileNamePrefix ${prefix}_ \\
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
@@ -334,6 +362,7 @@ process starsolo {
     cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
     """
+    }
 }
 
 /*
