@@ -324,12 +324,12 @@ process starsolo {
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
-    --soloFeatures Gene Velocyto \\
+    --soloFeatures Gene Velocyto GeneFull \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM_multi_pseudocounts
+    --soloCBmatchWLtype 1MM 
     
     cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
