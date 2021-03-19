@@ -321,8 +321,8 @@ process starsolo {
     --outFileNamePrefix ${prefix}_ \\
     --alignIntronMax 1 \\
     --outFilterMatchNmin 0 \\
-    --outFilterScoreMinOverLread 0.5 \\
-    --outFilterMatchNminOverLread 0.5 \\
+    --outFilterScoreMinOverLread 0.4 \\
+    --outFilterMatchNminOverLread 0.4 \\
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
