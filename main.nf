@@ -320,6 +320,9 @@ process starsolo {
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
     --alignIntronMax 1 \\
+    --outFilterMatchNmin 0 \\
+    --outFilterScoreMinOverLread 0.5 \\
+    --outFilterMatchNminOverLread 0.5 \\
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
