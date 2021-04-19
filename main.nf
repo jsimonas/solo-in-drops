@@ -199,7 +199,6 @@ process bcl_to_fastq {
     --use-bases-mask y*,I*,y*,y* \\
     --no-lane-splitting \\
     --create-fastq-for-index-reads \\
-    --barcode-mismatches 0 \\
     --processing-threads $task.cpus
     """
 }
