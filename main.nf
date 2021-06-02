@@ -321,8 +321,6 @@ process starsolo {
     --outFileNamePrefix ${prefix}_ \\
     --alignIntronMax 1 \\
     --outFilterMatchNmin 0 \\
-    --outFilterScoreMinOverLread 0.4 \\
-    --outFilterMatchNminOverLread 0.4 \\
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
@@ -335,6 +333,7 @@ process starsolo {
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
+    --soloMultiMappers PropUnique \\
     --soloCBmatchWLtype 1MM 
     
     cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
