@@ -322,6 +322,8 @@ process starsolo {
     --alignIntronMax 1 \\
     --outFilterMatchNmin 0 \\
     --outSAMunmapped Within \\
+    --outFilterScoreMinOverLread 0.4 \\
+    --outFilterMatchNminOverLread 0.4 \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
     --outSAMattributes NH HI AS nM CB UB \\
