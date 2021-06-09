@@ -330,6 +330,7 @@ process starsolo {
     --limitBAMsortRAM 1299605849 \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
+    --soloMultiMappers Uniform \\
     --soloFeatures Gene \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
