@@ -324,7 +324,7 @@ process starsolo {
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
-    --outSAMattributes NH HI AS nM CB UB \\
+    --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
     --limitBAMsortRAM 1299605849 \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
@@ -350,7 +350,7 @@ process starsolo {
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
-    --outSAMattributes NH HI AS nM CB UB \\
+    --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
