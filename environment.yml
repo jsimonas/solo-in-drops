@@ -13,6 +13,9 @@ dependencies:
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
   - conda-forge::graphviz=2.42.3
+  - conda-forge::pandas=1.1.5
+  - conda-forge::numpy=1.19.2
+  - conda-forge::openpyxl=3.0.9
   - bioconda::fastqc=0.11.8
   - bioconda::multiqc=1.9
   - bioconda::star=2.7.9a
