@@ -161,14 +161,14 @@ process get_software_versions {
     file "software_versions.csv"
 
     script:
-    // TODO nf-core: Get all tools to print their version number here
+    // versions of tools
     """
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
-    STAR --version &> v_star.txt 2>&1 || true
-    samtools --version &> v_samtools.txt || true
-    bcl2fastq --version &> v_bcl2fastq.txt || true
-    seqkit version &> v_seqkit.txt || true
+    STAR --version &> v_star.txt 2>&1
+    samtools --version |& grep "sam" &> v_samtools.txt
+    bcl2fastq --version |& grep "bcl" &> v_bcl2fastq.txt
+    seqkit version &> v_seqkit.txt
     multiqc --version &> v_multiqc.txt || true
     scrape_software_versions.py &> software_versions_mqc.yaml
     """

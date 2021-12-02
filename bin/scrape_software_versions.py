@@ -9,10 +9,10 @@ regexes = {
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
-    'STAR': ['v_star.txt', r"STAR, version (\S+)"],
-    'SAMtools': ['v_samtools.txt', r"SAMtools, version (\S+)"],
-    'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq, version (\S+)"],
-    'SeqKit': ['v_seqkit.txt', r"SeqKit, version (\S+)"],
+    'STAR': ['v_star.txt', r"(\S+)"],
+    'SAMtools': ['v_samtools.txt', r"samtools (\S+)"],
+    'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq (\S+)"],
+    'SeqKit': ['v_seqkit.txt', r"seqkit (\S+)"],
 }
 results = OrderedDict()
 results['jsimonas/solo-in-drops'] = '<span style="color:#999999;\">N/A</span>'
