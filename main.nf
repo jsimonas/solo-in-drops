@@ -18,11 +18,12 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run jsimonas/solo-in-drops --run_dir 'path/to/bcl_folder' --sample_sheet 'path/to/sample_sheet.csv' -profile singularity
+    nextflow run jsimonas/solo-in-drops --run_dir 'path/to/bcl_folder' --sample_sheet 'path/to/extended_sample_sheet.xlsx' -profile singularity
 
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
-      --sample_sheet [file]           Full path to to the sample sheet file
+      --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If latter selected, sample sheet is not required. Default: "complete".                
+      --sample_sheet [file]           Full path to extended sample sheet file. Example can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx
       --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
       --mode [str]                    STAR alignment mode. Default: "cell". Can be set as "bacteria" to switch off splice alignments.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
@@ -67,7 +68,16 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 }
 
 // Validate mandatory inputs
-if (params.sample_sheet) { sheet_file = file(params.sample_sheet, checkIfExists: true) } else { exit 1, "Sample sheet not found!" }
+if (!params.run_module.equals('complete') || !params.run_module.equals('demux') || !params.run_module.equals('fastq')){
+    exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
+}
+
+if (params.sample_sheet && (params.run_module == 'complete' || params.run_module == 'demux')){
+    sheet_file = file(params.sample_sheet, checkIfExists: true)
+    } else {
+    exit 1, "Sample sheet not found!"
+    }
+
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
 
 // TODO: properly add sequencer validation
