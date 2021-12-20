@@ -68,26 +68,26 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 }
 
 // Validate mandatory inputs
+
 if (!(params.run_module.equals('complete') || params.run_module.equals('demux') || params.run_module.equals('fastq'))){
     exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
 }
 
-if (params.sample_sheet && (params.run_module == 'complete' || params.run_module == 'demux')){
+if (params.sample_sheet && (params.run_module.equals('complete') || params.equals('demux')){
     sheet_file = file(params.sample_sheet, checkIfExists: true)
     } else {
-    exit 1, "Sample sheet not found!"
+    exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
     }
 
 if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
 
-// TODO: properly add sequencer validation
-//if (params.sequencer != 'nextseq' || params.sequencer != 'novaseq' || params.sequencer != 'hiseq' || params.sequencer != 'miseq' ){
-//    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
-//    }
+if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
+    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
+    }
 
 runName = runDir.getName()
 
-//Check STAR index
+// Check STAR index
 if( params.star_index ){
     star_index = Channel
         .fromPath(params.star_index)
