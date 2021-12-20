@@ -73,7 +73,7 @@ if (!(params.run_module.equals('complete') || params.run_module.equals('demux') 
     exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
 }
 
-if (params.sample_sheet && (params.run_module.equals('complete') || params.equals('demux')){
+if (params.sample_sheet && (params.run_module.equals('complete') || params.equals('demux'))){
     sheet_file = file(params.sample_sheet, checkIfExists: true)
     } else {
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
