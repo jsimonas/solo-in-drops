@@ -68,7 +68,7 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 }
 
 // Validate mandatory inputs
-if (!${params.run_module}.equals('complete') || !${params.run_module}.equals('demux') || !${params.run_module}.equals('fastq')){
+if (params.run_module ==~ 'complete' || params.run_module ==~ 'demux' || params.run_module ==~ 'fastq'){
     exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
 }
 
