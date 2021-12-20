@@ -21,7 +21,7 @@ def helpMessage() {
     nextflow run jsimonas/solo-in-drops --run_dir 'path/to/bcl_folder' --sample_sheet 'path/to/extended_sample_sheet.xlsx' -profile singularity
 
     Mandatory arguments:
-      --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
+      --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes).
       --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If the latter selected, sample sheet is not required. Default: "complete".                
       --sample_sheet [file]           Full path to extended sample sheet file. Example can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx
       --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
@@ -79,13 +79,16 @@ if (params.sample_sheet && (params.run_module.equals('complete') || params.equal
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
     }
 
-if (params.run_dir) { runDir = file(params.run_dir, checkIfExists: true) } else { exit 1, "Input directory not found!" }
+if (params.run_dir){
+    runDir = file(params.run_dir, checkIfExists: true)
+    } else {
+    exit 1, "Input directory not found!"
+    }
+runName = runDir.getName()
 
 if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
     }
-
-runName = runDir.getName()
 
 // Check STAR index
 if( params.star_index ){
@@ -112,6 +115,7 @@ def summary = [:]
 if (workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
+summary['Run module']       = params.run_module
 summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
 summary['Sequencer']        = params.sequencer
@@ -185,7 +189,30 @@ process get_software_versions {
 }
 
 /*
- * STEP 1 - convert bcl to fastq files
+ * STEP 1 - convert extended to standard sample sheet
+ */
+process convert_sample_sheet {
+    tag "$name"
+    label 'process_low'
+    publishDir path: "${params.outdir}/${runName}", mode: 'copy'
+ 
+    input:
+    file sheet from sheet_file
+
+    output:
+    file "*.csv" into standard_samplesheet
+    
+    when:
+    params.run_module.equals('complete') || params.equals('demux') 
+
+    script:
+    """
+    convert_to_samplesheet.py --file "${sheet}" --out "standard_samplesheet.csv"
+    """
+}
+
+/*
+ * STEP 2 - convert bcl to fastq files
  */
 process bcl_to_fastq {
     tag "$name"
@@ -193,7 +220,7 @@ process bcl_to_fastq {
     publishDir path: "${params.outdir}/${runName}/fastq", mode: 'copy'
  
     input:
-    file sheet from sheet_file
+    file sheet from standard_samplesheet
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
@@ -214,7 +241,7 @@ process bcl_to_fastq {
 }
 
 /*
- * STEP 2 - FastQC
+ * STEP 3 - FastQC
  */
 process fastqc {
     tag "$fastq"
@@ -255,7 +282,7 @@ fastqs_filtered_ch.flatMap()
             .set{ fastq_pairs_ch }
 
 /*
- * STEP 3 - Merge FASTQ
+ * STEP 4 - Merge FASTQ
  */
 process mergefastq {
     tag "$prefix"
@@ -296,7 +323,7 @@ process mergefastq {
 // merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
- * STEP 4 - STARsolo
+ * STEP 5 - STARsolo
  */
 process starsolo {
     tag "$prefix"
@@ -378,7 +405,7 @@ process starsolo {
 }
 
 /*
- * STEP 5 - MultiQC
+ * STEP 6 - MultiQC
  */
 process multiqc {
     publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
@@ -409,7 +436,7 @@ process multiqc {
 }
 
 /*
- * STEP 6 - Output Description HTML
+ * STEP 7 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
