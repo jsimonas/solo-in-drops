@@ -22,7 +22,7 @@ def helpMessage() {
 
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
-      --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If latter selected, sample sheet is not required. Default: "complete".                
+      --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If the  latter selected, sample sheet is not required. Default: "complete".                
       --sample_sheet [file]           Full path to extended sample sheet file. Example can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx
       --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
       --mode [str]                    STAR alignment mode. Default: "cell". Can be set as "bacteria" to switch off splice alignments.
@@ -68,7 +68,7 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 }
 
 // Validate mandatory inputs
-if (!params.run_module.equals('complete') || !params.run_module.equals('demux') || !params.run_module.equals('fastq')){
+if (!${params.run_module}.equals('complete') || !${params.run_module}.equals('demux') || !${params.run_module}.equals('fastq')){
     exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
 }
 
