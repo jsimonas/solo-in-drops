@@ -318,7 +318,7 @@ process mergefastq {
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    set val(projectName) val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
+    set val(projectName), val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
