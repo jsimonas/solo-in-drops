@@ -418,6 +418,7 @@ process starsolo {
     }
     else if (!(params.mode.equals('cell') || params.mode.equals('bacteria'))){
         exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --mode parameter."
+    }
 }
 
 /*
