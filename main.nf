@@ -267,7 +267,6 @@ process fastqc {
     set val(projectName), file(fastq) from fastqcs_ch
 
     when:
-/    params.run_module.equals('complete') || params.run_module.equals('demux') 
     params.run_module.equals('fastq')
 
     output:
@@ -278,6 +277,9 @@ process fastqc {
     fastqc --quiet --threads $task.cpus ${fastq}
     """
 }
+
+// params.run_module.equals('complete') || params.run_module.equals('demux') 
+
 
 // filter out 'Undetermined' fastq files
 fastqs_output_ch.flatMap()
