@@ -227,7 +227,8 @@ process bcl_to_fastq {
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
+    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
+    file "*{R1,R2,R3}_001.fastq.gz" into und_fastqs_fqc_ch mode flatten
 
     script:
     """
@@ -254,6 +255,7 @@ process fastqc {
         
     input:
     file(fastq) from fastqs_fqc_ch
+    file(und_fastq) from und_fastqs_fqc_ch
 
     when:
     params.run_module.equals('complete') || params.run_module.equals('demux') 
@@ -263,7 +265,7 @@ process fastqc {
 
     script:
     """
-    fastqc --quiet --threads $task.cpus ${fastq}
+    fastqc --quiet --threads $task.cpus ${fastq} ${und_fastq}
     """
 }
 
