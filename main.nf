@@ -304,7 +304,7 @@ fastqs_filtered_ch.flatMap()
             .set{ fastq_pairs_ch }
 
 fastq_test = Channel.empty()
-fastq_test_ch = fastq_test.mix(fastqs_filtered_ch)
+fastq_test_ch = fastq_test.mix(fastq_pairs_ch)
 fastq_test_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
