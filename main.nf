@@ -267,7 +267,8 @@ process fastqc {
     set val(projectName), file(fastq) from fastqcs_ch
 
     when:
-    params.run_module.equals('complete') || params.run_module.equals('demux') 
+/    params.run_module.equals('complete') || params.run_module.equals('demux') 
+    params.run_module.equals('fastq')
 
     output:
     file "*_fastqc.{zip,html}" into fastqc_results
@@ -297,10 +298,10 @@ fastqs_filtered_ch.flatMap()
                     return tuple(key, proj, file)
                 }
             }
-            .groupTuple()
+            .groupTuple(by: [0,1])
             .set{ fastq_pairs_ch }
 
-
+fastqs_filtered_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - Merge FASTQ
@@ -344,7 +345,16 @@ process mergefastq {
     }
 }
 
-// merged_fastqc_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+// assign fasta channel
+if(params.run_module.equals('fastq')){
+    merged_fastqc_paired_ch = Channel
+        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz')
+        .ifEmpty {
+            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
+            }
+} else {
+    merged_fastqc_paired_ch = merged_fastqc_ch
+}
 
 /*
  * STEP 5 - STARsolo
@@ -352,7 +362,16 @@ process mergefastq {
 process starsolo {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}/starsolo/$prefix", mode: 'copy'
+    publishDir "${params.outdir}/${runName}", mode: 'copy',
+        saveAs: {
+            filename -> 
+            if(params.run_module.equals('fastq')){
+                "starsolo/$prefix/$filename"
+            }
+            else {
+                "${projectName}/starsolo/$prefix/$filename"
+            }
+        }
     echo true
 
     input:
