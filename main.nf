@@ -227,7 +227,7 @@ process bcl_to_fastq {
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
+    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch, fastqs_output_ch2 mode flatten
     file "*{R1,R2,R3}_001.fastq.gz" into und_fastqs_fqc_ch mode flatten
 
     script:
@@ -303,9 +303,19 @@ fastqs_filtered_ch.flatMap()
             .groupTuple(by: [0,1])
             .set{ fastq_pairs_ch }
 
-fastq_test = Channel.empty()
-fastq_test_ch = fastq_test.mix(fastq_pairs_ch)
-fastq_test_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+fastqs_output_ch2.flatMap()
+            .map{ file ->
+                if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_")){
+                    def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
+                    def key = key_match[0][1]
+                    def proj = file.getParent().getName()
+                    return tuple(key, proj, file)
+                }
+            }
+            .groupTuple(by: [0,1])
+            .set{ fastq_pairs_ch2 }
+
+fastq_pairs_ch2.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - Merge FASTQ
