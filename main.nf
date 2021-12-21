@@ -218,7 +218,7 @@ process convert_sample_sheet {
 process bcl_to_fastq {
     tag "$name"
     label 'process_high'
-    publishDir path: "${params.outdir}/${runName}/fastq", mode: 'copy'
+    publishDir path: "${params.outdir}/${runName}", mode: 'copy'
  
     input:
     file sheet from standard_samplesheet
@@ -245,17 +245,26 @@ process bcl_to_fastq {
     """
 }
 
+// get project name
+fqname_fqfile_ch = fastqs_fqc_ch.map{
+    fqFile -> [fqFile.getParent().getName(), fqFile ]
+}
+undetermined_fqfile_ch = undetermined_default_fq_ch.map{
+    fqFile -> ["Undetermined", fqFile ]
+}
+fastqcs = Channel.empty()
+fastqcs_ch = fastqcs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
+
 /*
  * STEP 3 - FastQC
  */
 process fastqc {
     tag "$fastq"
     label 'process_medium'
-    publishDir "${params.outdir}/${runName}/fastqc", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/${projectName}/fastqc", mode: 'copy'
         
     input:
-    file(fastq) from fastqs_fqc_ch
-    file(und_fastq) from und_fastqs_fqc_ch
+    set val(projectName), file(fastq) from fastqcs_ch
 
     when:
     params.run_module.equals('complete') || params.run_module.equals('demux') 
@@ -265,7 +274,7 @@ process fastqc {
 
     script:
     """
-    fastqc --quiet --threads $task.cpus ${fastq} ${und_fastq}
+    fastqc --quiet --threads $task.cpus ${fastq}
     """
 }
 
@@ -289,6 +298,8 @@ fastqs_filtered_ch.flatMap()
             }
             .groupTuple()
             .set{ fastq_pairs_ch }
+
+
 
 /*
  * STEP 4 - Merge FASTQ
