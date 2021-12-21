@@ -247,10 +247,10 @@ process bcl_to_fastq {
 
 // get project name
 fqname_fqfile_ch = fastqs_fqc_ch.map{
-    fqFile -> [fqFile.getParent().getName(), fqFile ]
+    file -> [file.getParent().getName(), file]
 }
 undetermined_fqfile_ch = und_fastqs_fqc_ch.map{
-    fqFile -> ["Undetermined", fqFile ]
+    file -> ["Undetermined", file]
 }
 fastqcs = Channel.empty()
 fastqcs_ch = fastqcs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
@@ -293,7 +293,8 @@ fastqs_filtered_ch.flatMap()
                 if ( "${file}".contains("_R1_") || "${file}".contains("_R2_") || "${file}".contains("_R3_")){
                     def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
                     def key = key_match[0][1]
-                    return tuple(key, file)
+                    def proj = file.getParent().getName()
+                    return tuple(proj, key, file)
                 }
             }
             .groupTuple()
@@ -307,17 +308,17 @@ fastqs_filtered_ch.flatMap()
 process mergefastq {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}/merged_fastq", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/${projectName}/merged_fastq", mode: 'copy'
     echo true
     
     input:
-    set val(prefix), file(reads) from fastq_pairs_ch
+    set val(projectName), val(prefix), file(reads) from fastq_pairs_ch
     
     when:
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    set val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
+    set val(projectName) val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
