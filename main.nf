@@ -249,7 +249,7 @@ process bcl_to_fastq {
 fqname_fqfile_ch = fastqs_fqc_ch.map{
     fqFile -> [fqFile.getParent().getName(), fqFile ]
 }
-undetermined_fqfile_ch = undetermined_default_fq_ch.map{
+undetermined_fqfile_ch = und_fastqs_fqc_ch.map{
     fqFile -> ["Undetermined", fqFile ]
 }
 fastqcs = Channel.empty()
