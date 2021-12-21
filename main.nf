@@ -303,7 +303,9 @@ fastqs_filtered_ch.flatMap()
             .groupTuple(by: [0,1])
             .set{ fastq_pairs_ch }
 
-fastqs_filtered_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+fastq_test = Channel.empty()
+fastq_test_ch = fastq_test.mix(fastqs_filtered_ch)
+fastq_test_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 4 - Merge FASTQ
