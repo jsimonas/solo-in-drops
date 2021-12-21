@@ -294,7 +294,7 @@ fastqs_filtered_ch.flatMap()
                     def key_match = file.name.toString() =~ /(.+)_R\d+_001\.fastq\.gz/
                     def key = key_match[0][1]
                     def proj = file.getParent().getName()
-                    return tuple(proj, key, file)
+                    return tuple(key, proj, file)
                 }
             }
             .groupTuple()
@@ -312,13 +312,13 @@ process mergefastq {
     echo true
     
     input:
-    set val(projectName), val(prefix), file(reads) from fastq_pairs_ch
+    set val(prefix), val(projectName), file(reads) from fastq_pairs_ch
     
     when:
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    set val(projectName), val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), val(projectName), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
     
     script:
     R1 = reads[0]
