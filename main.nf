@@ -73,7 +73,7 @@ if (!(params.run_module.equals('complete') || params.run_module.equals('demux') 
     exit 1, "Uncorrect pipeline run module was provided! Can be set as 'complete', 'demux' or 'fastq' module."
 }
 
-if (params.sample_sheet && (params.run_module.equals('complete') || params.equals('demux'))){
+if (params.sample_sheet && (params.run_module.equals('complete') || params.run_module.equals('demux'))){
     sheet_file = file(params.sample_sheet, checkIfExists: true)
     } else {
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
@@ -183,6 +183,7 @@ process get_software_versions {
     samtools --version |& grep "sam" &> v_samtools.txt
     bcl2fastq --version |& grep "bcl" &> v_bcl2fastq.txt
     seqkit version &> v_seqkit.txt
+    fastqc -version |& grep "v" &> v_fastqc.txt
     multiqc --version &> v_multiqc.txt || true
     scrape_software_versions.py &> software_versions_mqc.yaml
     """
@@ -199,12 +200,12 @@ process convert_sample_sheet {
     input:
     file sheet from sheet_file
 
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('demux') 
+
     output:
     file "*.csv" into standard_samplesheet
     
-    when:
-    params.run_module.equals('complete') || params.equals('demux') 
-
     script:
     """
     convert_to_samplesheet.py --file "${sheet}" --out "standard_samplesheet.csv"
@@ -221,6 +222,9 @@ process bcl_to_fastq {
  
     input:
     file sheet from standard_samplesheet
+
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
     file "*{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
@@ -250,6 +254,9 @@ process fastqc {
         
     input:
     file(fastq) from fastqs_fqc_ch
+
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
     file "*_fastqc.{zip,html}" into fastqc_results
@@ -287,12 +294,15 @@ fastqs_filtered_ch.flatMap()
 process mergefastq {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}/merged_fastqc", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/merged_fastq", mode: 'copy'
     echo true
     
     input:
     set val(prefix), file(reads) from fastq_pairs_ch
     
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('demux') 
+
     output:
     set val(prefix), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
     
@@ -336,6 +346,9 @@ process starsolo {
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
+    when:
+    params.run_module != 'demux' 
+
     output:
     file "*.bam"
     file "*.out" into alignment_logs
@@ -348,7 +361,7 @@ process starsolo {
     bc_read = reads[0]
     cdna_read = reads[1]
     
-    if ( params.mode != "cell" ){
+    if (params.mode.equals('bacteria')){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -362,7 +375,6 @@ process starsolo {
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
     --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
-    --limitBAMsortRAM 1299605849 \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
     --soloMultiMappers Uniform \\
@@ -376,7 +388,7 @@ process starsolo {
     cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
     
     """
-    } else {
+    } else if (params.mode.equals('cell')){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -402,6 +414,8 @@ process starsolo {
     
     """
     }
+    else if (!(params.mode.equals('cell') || params.mode.equals('bacteria'))){
+        exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --mode parameter."
 }
 
 /*

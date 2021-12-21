@@ -11,8 +11,8 @@ regexes = {
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
     'STAR': ['v_star.txt', r"(\S+)"],
     'SAMtools': ['v_samtools.txt', r"samtools (\S+)"],
-    'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq (\S+)"],
-    'SeqKit': ['v_seqkit.txt', r"seqkit (\S+)"],
+    'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq v(\S+)"],
+    'SeqKit': ['v_seqkit.txt', r"seqkit v(\S+)"],
 }
 results = OrderedDict()
 results['jsimonas/solo-in-drops'] = '<span style="color:#999999;\">N/A</span>'
