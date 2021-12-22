@@ -352,12 +352,15 @@ process mergefastq {
 //}
 
 if(params.run_module.equals('fastq')){
-    merged_fastqc_paired_ch = Channel
-        .fromFilePairs('${runDir}/**_{bc,cdna}_001.fastq.gz')
-        .ifEmpty {
-            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
-            }
-        .view()
+    Channel
+        .watchPath( '${runDir}/*_{bc,cdna}_001.fastq.gz' )
+        .subscribe { println "Fasta file: $it" }
+//    merged_fastqc_paired_ch = Channel
+//        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz')
+//        .ifEmpty {
+//            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
+//            }
+//        .view()
 //        .map {
 //            prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
 //        }
