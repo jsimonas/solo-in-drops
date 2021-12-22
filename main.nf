@@ -353,7 +353,7 @@ process mergefastq {
 
 if(params.run_module.equals('fastq')){
     Channel
-        .watchPath( '$runDir/*_{bc,cdna}_001.fastq.gz' )
+        .watchPath( '${runDir}/*_{bc,cdna}_001.fastq.gz' )
         .subscribe { println "Fasta file: $it" }
 //    merged_fastqc_paired_ch = Channel
 //        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz')
