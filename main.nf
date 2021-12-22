@@ -75,9 +75,11 @@ if (!(params.run_module.equals('complete') || params.run_module.equals('demux') 
 
 if (params.sample_sheet && (params.run_module.equals('complete') || params.run_module.equals('demux'))){
     sheet_file = file(params.sample_sheet, checkIfExists: true)
-    } else {
+} else if (params.run_module.equals('fastq')) {
+    null
+} else {
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
-    }
+}
 
 if (params.run_dir){
     runDir = file(params.run_dir, checkIfExists: true)
@@ -88,7 +90,7 @@ runName = runDir.getName()
 
 if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
-    }
+}
 
 // Check STAR index
 if( params.star_index ){
@@ -227,7 +229,7 @@ process bcl_to_fastq {
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch, fastqs_output_ch2 mode flatten
+    file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
     file "*{R1,R2,R3}_001.fastq.gz" into und_fastqs_fqc_ch mode flatten
 
     script:
@@ -291,8 +293,6 @@ fastqs_output_ch.flatMap()
             .groupTuple(by: [0,1])
             .set{ fastq_pairs_ch }
 
-//fastq_pairs_ch2.subscribe onNext: { println it }, onComplete: { println 'Done' }
-
 /*
  * STEP 4 - Merge FASTQ
  */
@@ -338,13 +338,20 @@ process mergefastq {
 // assign fasta channel
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
-        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz')
+        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz', size: -1)
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
             }
+        .view()
+        .map {
+            prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
+        }
+        .view()
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
+
+merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 5 - STARsolo
@@ -365,7 +372,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastqc_paired_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastqc_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
@@ -446,7 +453,8 @@ process starsolo {
  * STEP 6 - MultiQC
  */
 process multiqc {
-    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
+    tag "${projectName}"
+    publishDir "${params.outdir}/${runName}/${projectName}/multiqc", mode: 'copy'
 
     input:
     file (multiqc_config) from ch_multiqc_config
