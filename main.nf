@@ -76,7 +76,7 @@ if (!(params.run_module.equals('complete') || params.run_module.equals('demux') 
 if (params.sample_sheet && (params.run_module.equals('complete') || params.run_module.equals('demux'))){
     sheet_file = file(params.sample_sheet, checkIfExists: true)
 } else if (params.run_module.equals('fastq')) {
-    null
+    sheet_file = Channel.empty()
 } else {
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
 }
