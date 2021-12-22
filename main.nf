@@ -267,7 +267,7 @@ process fastqc {
     set val(projectName), file(fastq) from fastqcs_ch
 
     when:
-    params.run_module.equals('fastq')
+    params.run_module.equals('complete') || params.run_module.equals('demux')
 
     output:
     file "*_fastqc.{zip,html}" into fastqc_results
@@ -277,8 +277,6 @@ process fastqc {
     fastqc --quiet --threads $task.cpus ${fastq}
     """
 }
-
-// params.run_module.equals('complete') || params.run_module.equals('demux') 
 
 // make paired channel for fastqs
 fastqs_output_ch.flatMap()
@@ -354,7 +352,7 @@ if(params.run_module.equals('fastq')){
 process starsolo {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}", mode: 'copy',
+    publishDir "${params.outdir}/${runName}/", mode: 'copy',
         saveAs: {
             filename -> 
             if(params.run_module.equals('fastq')){
@@ -367,7 +365,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), file(reads) from merged_fastqc_ch
+    set val(prefix), file(reads) from merged_fastqc_paired_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
