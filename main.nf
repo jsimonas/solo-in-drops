@@ -193,7 +193,7 @@ process get_software_versions {
  * STEP 1 - convert extended to standard sample sheet
  */
 process convert_sample_sheet {
-    tag "$name"
+    tag "$sheet"
     label 'process_low'
     publishDir path: "${params.outdir}/${runName}", mode: 'copy'
  
@@ -216,7 +216,7 @@ process convert_sample_sheet {
  * STEP 2 - convert bcl to fastq files
  */
 process bcl_to_fastq {
-    tag "$runDir"
+    tag "$runName"
     label 'process_high'
     publishDir path: "${params.outdir}/${runName}", mode: 'copy'
  
