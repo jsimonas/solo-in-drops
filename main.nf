@@ -363,10 +363,9 @@ if(params.run_module.equals('fastq')){
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
             }
+        { file -> subtags = (file.name =~ /(\S+)_S\d+_(\S+)_001/)[0] ; subtags[1]+"###"+subtags[2] }
         .view()
-        .map {
-            prefix, file -> subtags = (prefix =~ /(_bc_001)?(\.fastq)?(\.gz)?$/)[0]; [subtags[1], subtags[2], file]
-        }
+        .map { tag, pair -> subtags = tag.split(/###/) ; [subtags[0], subtags[1], pair] }
         .view()
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
