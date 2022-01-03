@@ -346,12 +346,11 @@ if(params.run_module.equals('fastq')){
         .map {
             tag, pair -> subtags = tag.split(/,/) ; [subtags[0], subtags[1], pair] 
         }
-        .view()
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
 
-merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+// merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 5 - STARsolo
@@ -372,7 +371,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastqc_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastqc_paired_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
