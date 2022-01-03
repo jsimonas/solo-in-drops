@@ -399,7 +399,7 @@ process starsolo {
     file whitelist from barcode_whitelist.collect()
 
     when:
-    params.run_module != 'demux' 
+    !(params.run_module.equals('demux')) 
 
     output:
     file "*.bam"
@@ -475,7 +475,6 @@ process starsolo {
  * STEP 6 - MultiQC
  */
 process multiqc {
-    tag "${projectName}"
     publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
 
     input:
