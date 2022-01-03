@@ -363,17 +363,18 @@ if(params.run_module.equals('fastq')){
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
             }
-//         .view()
-//         .map {
-//             prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
-//         }
-//         .view()
+        .view()
+        .map {
+            prefix, file -> subtags = (prefix =~ /(_bc_001)?(\.fastq)?(\.gz)?$/)[0]; [subtags[1], subtags[2], file]
+        }
+        .view()
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
 
+///(sample\d+)_S\d+_L0+(\d+)/)[0]
 
-// merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
+merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 5 - STARsolo
@@ -394,7 +395,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastqc_paired_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastqc_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
