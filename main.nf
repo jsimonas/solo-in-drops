@@ -92,6 +92,12 @@ if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') |
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
 }
 
+if (params.run_module.equals('fastq')){
+    params.reads = "$runDir/*_{bc,cdna}_001.fastq.gz"
+} else {
+    params.reads = Channel.empty()
+}
+
 // Check STAR index
 if( params.star_index ){
     star_index = Channel
@@ -352,19 +358,16 @@ process mergefastq {
 //}
 
 if(params.run_module.equals('fastq')){
-    Channel
-        .watchPath( "$runDir/*_{bc,cdna}_001.fastq.gz" )
-        .subscribe { println "Fasta file: $it" }
-//    merged_fastqc_paired_ch = Channel
-//        .fromFilePairs('${runDir}/*_{bc,cdna}_001.fastq.gz')
-//        .ifEmpty {
-//            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
-//            }
-//        .view()
-//        .map {
-//            prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
-//        }
-//        .view()
+    merged_fastqc_paired_ch = Channel
+        .fromFilePairs(params.reads)
+        .ifEmpty {
+            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
+            }
+//         .view()
+//         .map {
+//             prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
+//         }
+//         .view()
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
