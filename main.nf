@@ -359,7 +359,7 @@ process mergefastq {
 
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
-        .fromFilePairs(params.reads)
+        .fromFilePairs(params.reads, size: -1)
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
             }
