@@ -394,7 +394,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastqc_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastqc_paired_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
