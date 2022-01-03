@@ -360,11 +360,10 @@ process mergefastq {
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
         .fromFilePairs(params.reads, size: -1)
-//        .ifEmpty {
-//            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
-//            }
-        { file -> subtags = (file.name =~ /(.+)_(\d+_S\d+)_\S+_001/)[0] ; subtags[1]+subtags[2]+"###"+subtags[1] }
-        .view()
+        { file -> subtags = (file.name =~ /(.+)_(\d+_S\d+)_\S+_001/)[0] ; subtags[1]+subtags[2]+","+subtags[1] }
+        .ifEmpty {
+            error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
+        }
         .map {
             tag, pair -> subtags = tag.split(/###/) ; [subtags[0], subtags[1], pair] 
         }
@@ -372,8 +371,6 @@ if(params.run_module.equals('fastq')){
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
-
-///(sample\d+)_S\d+_L0+(\d+)/)[0]
 
 merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
