@@ -366,7 +366,7 @@ if(params.run_module.equals('fastq')){
 //        { file -> subtags = (file.name =~ /(.+)_(\d+)_S\d+_\S+_001/)[0] ; subtags[1]+"###"+subtags[2] }
         .view()
         .map {
-            prefix, file -> subtags = (prefix =~ /(sample\d+)_S\d+_L0+(\d+)/)[0]; [subtags[1], subtags[2], file]
+            prefix, file -> subtags = (prefix =~ /(.+)_(\d+)_S\d+_\S+_001/)[0]; [subtags[1], subtags[2], file]
         }
         .view()
 } else {
