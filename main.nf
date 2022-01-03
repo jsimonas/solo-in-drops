@@ -476,7 +476,7 @@ process starsolo {
  */
 process multiqc {
     tag "${projectName}"
-    publishDir "${params.outdir}/${runName}/${projectName}/multiqc", mode: 'copy'
+    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
 
     input:
     file (multiqc_config) from ch_multiqc_config
