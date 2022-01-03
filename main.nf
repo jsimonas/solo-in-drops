@@ -92,12 +92,6 @@ if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') |
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
 }
 
-if (params.run_module.equals('fastq')){
-    params.reads = "$runDir/*_{bc,cdna}_001.fastq.gz"
-} else {
-    params.reads = Channel.empty()
-}
-
 // Check STAR index
 if( params.star_index ){
     star_index = Channel
