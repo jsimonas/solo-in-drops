@@ -335,7 +335,7 @@ process mergefastq {
     }
 }
 
-// assign fasta channel
+// assign fastq channel
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
         .fromFilePairs("$runDir/*_{bc,cdna}_001.fastq.gz", size: -1)
@@ -358,14 +358,14 @@ if(params.run_module.equals('fastq')){
 process starsolo {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}/", mode: 'copy',
+    publishDir "${params.outdir}/", mode: 'copy',
         saveAs: {
             filename -> 
             if(params.run_module.equals('fastq')){
                 "starsolo/$prefix/$filename"
             }
             else {
-                "${projectName}/starsolo/$prefix/$filename"
+                "${runName}/${projectName}/starsolo/$prefix/$filename"
             }
         }
     echo true
@@ -452,7 +452,16 @@ process starsolo {
  * STEP 6 - MultiQC
  */
 process multiqc {
-    publishDir "${params.outdir}/${runName}/multiqc", mode: 'copy'
+    publishDir "${params.outdir}/", mode: 'copy',
+    saveAs: {
+        filename -> 
+        if(params.run_module.equals('fastq')){
+            "multiqc/$filename"
+        }
+        else {
+        "${runName}/multiqc/$filename"
+        }
+    }
 
     input:
     file (multiqc_config) from ch_multiqc_config
