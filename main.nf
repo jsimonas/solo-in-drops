@@ -234,6 +234,7 @@ process bcl_to_fastq {
     output:
     file "*/**{R1,R2,R3}_001.fastq.gz" into fastqs_fqc_ch, fastqs_output_ch mode flatten
     file "*{R1,R2,R3}_001.fastq.gz" into und_fastqs_fqc_ch mode flatten
+    file "Stats" into bcl2fq_stats_ch mode flatten
 
     script:
     """
@@ -342,12 +343,12 @@ process mergefastq {
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
         .fromFilePairs("$runDir/*_{bc,cdna}_001.fastq.gz", size: -1)
-        { file -> subtags = (file.name =~ /(.+)(_\d+_S\d+)_\S+_001/)[0]; subtags[1]+subtags[2]+","+subtags[1] }
+        { file -> tags = (file.name =~ /(.+)(_\d+_S\d+)_\S+_001/)[0]; tags[1]+tags[2]+","+tags[1] }
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
         }
         .map {
-            tag, pair -> subtags = tag.split(/,/) ; [subtags[0], subtags[1], pair] 
+            tag, pair -> tags = tag.split(/,/) ; [tags[0], tags[1], pair] 
         }
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
@@ -381,10 +382,8 @@ process starsolo {
 
     output:
     file "*.bam"
-    file "*.out" into alignment_logs
-    file "${prefix}_Gene_Summary.csv" into starsolo_logs
-    file "*SJ.out.tab"
-    file "*Solo.out"
+    file "*.out" 
+    set val(prefix), val(projectName), file("*.final.out") into alignment_logs
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
@@ -445,9 +444,9 @@ process starsolo {
 }
 
 /*
- * STEP 6 - MultiQC
+ * STEP 6 - MultiQC demux
  */
-process multiqc {
+process multiqc_demux {
     publishDir "${params.outdir}/", mode: 'copy',
     saveAs: {
         filename -> 
@@ -462,12 +461,49 @@ process multiqc {
     input:
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
-    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
+    file file bcl2fq_stats from bcl2fq_stats_ch.ifEmpty([])
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
-    file (starsolo:'starsolo/*') from starsolo_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
+    
+    output:
+    file "*multiqc_report_demux.html" into ch_multiqc_report_demux
+    file "*_data_demux"
+    file "multiqc_plots_demux"
+
+    script:
+    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
+    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
+    custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
+    """
+    multiqc -f $rtitle $rfilename $custom_config_file .
+    """
+}
+
+/*
+ * STEP 7 - MultiQC
+ */
+process multiqc {
+    tag "projectName"
+    publishDir "${params.outdir}/", mode: 'copy',
+    saveAs: {
+        filename -> 
+        if(params.run_module.equals('fastq')){
+            "multiqc/$filename"
+        }
+        else {
+        "${runName}/${projectName}/multiqc/$filename"
+        }
+    }
+
+    input:
+    file (multiqc_config) from ch_multiqc_config
+    file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
+    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
+    set val(prefix), val(projectName), file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('fastq') 
     
     output:
     file "*multiqc_report.html" into ch_multiqc_report
@@ -485,7 +521,7 @@ process multiqc {
 }
 
 /*
- * STEP 7 - Output Description HTML
+ * STEP 8 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
