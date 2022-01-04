@@ -223,7 +223,7 @@ process convert_sample_sheet {
 process bcl_to_fastq {
     tag "$runName"
     label 'process_high'
-\\    publishDir path: "${params.outdir}/", pattern: "*.fastq.gz", mode: 'copy'
+//    publishDir path: "${params.outdir}/", pattern: "*.fastq.gz", mode: 'copy'
     publishDir path: "${params.outdir}/", mode: 'copy',
     saveAs: { 
         filename -> filename.endsWith(".fastq.gz") ? "fastqs/$filename" : filename
