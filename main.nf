@@ -461,7 +461,7 @@ process multiqc_demux {
     input:
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
-    file file bcl2fq_stats from bcl2fq_stats_ch.ifEmpty([])
+    file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
