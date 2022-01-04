@@ -223,7 +223,7 @@ process convert_sample_sheet {
 process bcl_to_fastq {
     tag "$runName"
     label 'process_high'
-    publishDir path: "${params.outdir}/", pattern: "*.fastq", mode: 'copy'
+    publishDir path: "${params.outdir}/", pattern: "*.fastq.gz", mode: 'copy'
  
     input:
     file sheet from standard_samplesheet
@@ -248,6 +248,7 @@ process bcl_to_fastq {
     --no-lane-splitting \\
     --create-fastq-for-index-reads \\
     --processing-threads $task.cpus
+    
     """
 }
 
