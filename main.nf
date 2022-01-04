@@ -200,7 +200,7 @@ process get_software_versions {
 process convert_sample_sheet {
     tag "$sheet"
     label 'process_low'
-    publishDir path: "${params.outdir}/${runName}", mode: 'copy'
+    publishDir path: "${params.outdir}", mode: 'copy'
  
     input:
     file sheet from sheet_file
@@ -223,7 +223,7 @@ process convert_sample_sheet {
 process bcl_to_fastq {
     tag "$runName"
     label 'process_high'
-    publishDir path: "${params.outdir}/${runName}", mode: 'copy'
+    publishDir path: "${params.outdir}/", mode: 'copy'
  
     input:
     file sheet from standard_samplesheet
@@ -267,7 +267,7 @@ fastqcs_ch = fastqcs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
 process fastqc {
     tag "$fastq"
     label 'process_medium'
-    publishDir "${params.outdir}/${runName}/${projectName}/fastqc", mode: 'copy'
+    publishDir "${params.outdir}/${projectName}/fastqc", mode: 'copy'
         
     input:
     set val(projectName), file(fastq) from fastqcs_ch
@@ -303,7 +303,7 @@ fastqs_output_ch.flatMap()
 process mergefastq {
     tag "$prefix"
     label 'process_high'
-    publishDir "${params.outdir}/${runName}/${projectName}/merged_fastq", mode: 'copy'
+    publishDir "${params.outdir}/${projectName}/merged_fastq", mode: 'copy'
     echo true
     
     input:
@@ -367,7 +367,7 @@ process starsolo {
                 "starsolo/$prefix/$filename"
             }
             else {
-                "${runName}/${projectName}/starsolo/$prefix/$filename"
+                "${projectName}/starsolo/$prefix/$filename"
             }
         }
     echo true
@@ -447,16 +447,9 @@ process starsolo {
  * STEP 6 - MultiQC demux
  */
 process multiqc_demux {
-    publishDir "${params.outdir}/", mode: 'copy',
-    saveAs: {
-        filename -> 
-        if(params.run_module.equals('fastq')){
-            "multiqc_demux/$filename"
-        }
-        else {
-        "${runName}/multiqc_demux/$filename"
-        }
-    }
+    tag "$runName"
+    label 'process_low'
+    publishDir "${params.outdir}/multiqc_demux", mode: 'copy'
 
     input:
     file (multiqc_config) from ch_multiqc_config
@@ -464,6 +457,9 @@ process multiqc_demux {
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary_demux.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml_demux.collect()
+    
+    when:
+    params.run_module.equals('complete') || params.run_module.equals('demux') 
     
     output:
     file "*multiqc_report.html" into ch_multiqc_report_demux
@@ -490,7 +486,7 @@ process multiqc {
             "multiqc/$filename"
         }
         else {
-        "${runName}/${projectName}/multiqc/$filename"
+        "${projectName}/multiqc/$filename"
         }
     }
 
@@ -498,7 +494,7 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    set val(prefix), val(projectName), file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    set val(prefix), val(projectName), file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
 
