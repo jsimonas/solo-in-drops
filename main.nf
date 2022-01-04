@@ -451,10 +451,10 @@ process multiqc_demux {
     saveAs: {
         filename -> 
         if(params.run_module.equals('fastq')){
-            "multiqc/$filename"
+            "multiqc_demux/$filename"
         }
         else {
-        "${runName}/multiqc/$filename"
+        "${runName}/multiqc_demux/$filename"
         }
     }
 
@@ -466,9 +466,9 @@ process multiqc_demux {
     file ('software_versions/*') from ch_software_versions_yaml_demux.collect()
     
     output:
-    file "*multiqc_report_demux.html" into ch_multiqc_report_demux
-    file "*_data_demux"
-    file "multiqc_plots_demux"
+    file "*multiqc_report.html" into ch_multiqc_report_demux
+    file "*_data"
+    file "multiqc_plots"
 
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
