@@ -163,7 +163,7 @@ Channel.from(summary.collect{ [it.key, it.value] })
             $x
         </dl>
     """.stripIndent() }
-    .set { ch_workflow_summary }
+    .set { ch_workflow_summary, ch_workflow_summary_demux }
 
 /*
  * Parse software version numbers
@@ -176,7 +176,7 @@ process get_software_versions {
                 }
 
     output:
-    file 'software_versions_mqc.yaml' into ch_software_versions_yaml
+    file 'software_versions_mqc.yaml' into ch_software_versions_yaml, ch_software_versions_yaml_demux
     file "software_versions.csv"
 
     script:
@@ -460,11 +460,10 @@ process multiqc_demux {
 
     input:
     file (multiqc_config) from ch_multiqc_config
-    file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
-    file ('software_versions/*') from ch_software_versions_yaml.collect()
+    file workflow_summary from ch_workflow_summary_demux.collectFile(name: "workflow_summary_mqc.yaml")
+    file ('software_versions/*') from ch_software_versions_yaml_demux.collect()
     
     output:
     file "*multiqc_report_demux.html" into ch_multiqc_report_demux
@@ -474,9 +473,8 @@ process multiqc_demux {
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
     """
-    multiqc -f $rtitle $rfilename $custom_config_file .
+    multiqc -f $rtitle $rfilename .
     """
 }
 
@@ -501,7 +499,9 @@ process multiqc {
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     set val(prefix), val(projectName), file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
-    
+    file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
+    file ('software_versions/*') from ch_software_versions_yaml.collect()
+
     when:
     params.run_module.equals('complete') || params.run_module.equals('fastq') 
     
