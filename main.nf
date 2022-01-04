@@ -163,7 +163,7 @@ Channel.from(summary.collect{ [it.key, it.value] })
             $x
         </dl>
     """.stripIndent() }
-    .into { ch_workflow_summary, ch_workflow_summary_demux }
+    .into { ch_workflow_summary; ch_workflow_summary_demux }
 
 /*
  * Parse software version numbers
