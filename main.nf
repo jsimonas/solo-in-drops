@@ -200,7 +200,7 @@ process get_software_versions {
 process convert_sample_sheet {
     tag "$sheet"
     label 'process_low'
-    publishDir path: "${params.outdir}", mode: 'copy'
+    publishDir path: "${params.outdir}/", mode: 'copy'
  
     input:
     file sheet from sheet_file
