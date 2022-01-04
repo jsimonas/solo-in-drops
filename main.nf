@@ -34,7 +34,9 @@ def helpMessage() {
       --barcode_whitelist [file]      Path to cell barcode list (a text file containing one barcode sequence per line)
     
     STARsolo arguments:               If not specified, the default parameters will be used
-      --bc_read_length [int]          Read length of cell barcode read. Default: equal to sum of BC + UMI     
+      --bc_read_length [int]          Read length of cell barcode read. Default: equal to sum of BC + UMI
+      --solo_multi_mappers            Allow multi-gene read quantification. Can be set as "Uniform", "PropUnique", "EM", "Rescue" or any combination of these options.
+                                      More details can be found in STAR manual. Default: "Uniform".
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved
@@ -122,6 +124,7 @@ summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
 summary['Sequencer']        = params.sequencer
 summary['Aligment mode']    = params.mode
+summary['Multi-mapper recovery'] = params.solo_multi_mappers
 summary['STAR index']       = params.star_index
 summary['CB whitelist']     = params.barcode_whitelist
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
@@ -335,7 +338,7 @@ process mergefastq {
     }
 }
 
-// assign fastq channel
+// assign merged fastq channel
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
         .fromFilePairs("$runDir/*_{bc,cdna}_001.fastq.gz", size: -1)
@@ -349,8 +352,6 @@ if(params.run_module.equals('fastq')){
 } else {
     merged_fastqc_paired_ch = merged_fastqc_ch
 }
-
-// merged_fastqc_paired_ch.subscribe onNext: { println it }, onComplete: { println 'Done' }
 
 /*
  * STEP 5 - STARsolo
@@ -406,16 +407,13 @@ process starsolo {
     --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
-    --soloMultiMappers Uniform \\
+    --soloMultiMappers ${params.solo_multi_mappers} \\
     --soloFeatures Gene \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
-    --soloCBmatchWLtype 1MM 
-    
-    cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
-    
+    --soloCBmatchWLtype 1MM     
     """
     } else if (params.mode.equals('cell')){
     """
@@ -432,15 +430,13 @@ process starsolo {
     --twopassMode Basic \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
+    --soloMultiMappers ${params.solo_multi_mappers} \\
     --soloFeatures Gene Velocyto GeneFull \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM 
-    
-    cp "${prefix}_Solo.out/Gene/Summary.csv" "${prefix}_Gene_Summary.csv"
-    
     """
     }
     else if (!(params.mode.equals('cell') || params.mode.equals('bacteria'))){
