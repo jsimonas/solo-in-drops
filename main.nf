@@ -230,11 +230,11 @@ process bcl_to_fastq {
             else null
         }
         
-    publishDir path: "${params.outdir}/", pattern: "*.fastq.gz", mode: 'copy',
-        saveAs: { filename -> 
-            if (params.write_fastq) "Undetermined/fastqs/$filename" : filename
-            else null
-        }
+//    publishDir path: "${params.outdir}/", pattern: "*.fastq.gz", mode: 'copy',
+//        saveAs: { filename -> 
+//            if (params.write_fastq) "Undetermined/fastqs/$filename" : filename
+//            else null
+//        }
 
     input:
     file sheet from standard_samplesheet
