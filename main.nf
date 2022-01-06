@@ -262,7 +262,7 @@ process bcl_to_fastq {
     """
 }
 
-// get project name
+// add project name
 fqname_fqfile_ch = fastqs_fqc_ch.map{
     file -> [file.getParent().getName(), file]
 }
@@ -287,7 +287,7 @@ process fastqc {
     params.run_module.equals('complete') || params.run_module.equals('demux')
 
     output:
-    file "*_fastqc.{zip,html}" into fastqc_results
+    set val(projectName), file("*_fastqc.{zip,html}") into fastqc_results
 
     script:
     """
@@ -489,7 +489,7 @@ process multiqc_demux {
  * STEP 7 - MultiQC
  */
 process multiqc {
-    tag "projectName"
+    tag "$projectName"
     publishDir "${params.outdir}/", mode: 'copy',
     saveAs: {
         filename -> 
@@ -505,7 +505,7 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    set val(prefix), val(projectName), file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
 
