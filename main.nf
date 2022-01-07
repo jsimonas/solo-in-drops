@@ -394,7 +394,7 @@ process starsolo {
     output:
     file "*.bam"
     file "*.out" 
-    set val(prefix), val(projectName), file("*.final.out") into alignment_logs
+    set val($projectName), file("*.final.out") into alignment_logs
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
@@ -505,7 +505,8 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    //file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    set val(projectName), file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
 
