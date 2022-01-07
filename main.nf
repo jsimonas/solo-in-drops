@@ -394,7 +394,7 @@ process starsolo {
     output:
     file "*.bam"
     file "*.out" 
-    set val($projectName), file("*.final.out") into alignment_logs
+    set val(projectName), file("*.final.out") into alignment_logs
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
