@@ -164,7 +164,7 @@ Channel.from(summary.collect{ [it.key, it.value] })
             $x
         </dl>
     """.stripIndent() }
-    .into { ch_workflow_summary; ch_workflow_summary_demux }
+    .set { ch_workflow_summary }
 
 /*
  * Parse software version numbers
@@ -177,7 +177,7 @@ process get_software_versions {
                 }
 
     output:
-    file 'software_versions_mqc.yaml' into ch_software_versions_yaml, ch_software_versions_yaml_demux
+    file 'software_versions_mqc.yaml' into ch_software_versions_yaml
     file "software_versions.csv"
 
     script:
@@ -455,63 +455,21 @@ process starsolo {
 }
 
 /*
- * STEP 6 - MultiQC demux
- */
-process multiqc_demux {
-    tag "$runName"
-    label 'process_low'
-    publishDir "${params.outdir}/multiqc_demux", mode: 'copy'
-
-    input:
-    file (multiqc_config) from ch_multiqc_config
-    file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-    file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file workflow_summary from ch_workflow_summary_demux.collectFile(name: "workflow_summary_mqc.yaml")
-    file ('software_versions/*') from ch_software_versions_yaml_demux.collect()
-    
-    when:
-    params.run_module.equals('complete') || params.run_module.equals('demux') 
-    
-    output:
-    file "*multiqc_report.html" into ch_multiqc_report_demux
-    file "*_data"
-    file "multiqc_plots"
-
-    script:
-    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
-    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    """
-    multiqc -f $rtitle $rfilename .
-    """
-}
-
-/*
- * STEP 7 - MultiQC
+ * STEP 6 - MultiQC 
  */
 process multiqc {
-    tag "$projectName"
-    publishDir "${params.outdir}/", mode: 'copy',
-    saveAs: {
-        filename -> 
-        if(params.run_module.equals('fastq')){
-            "multiqc/$filename"
-        }
-        else {
-        "${projectName}/multiqc/$filename"
-        }
-    }
+    tag "$runName"
+    label 'process_low'
+    publishDir "${params.outdir}/multiqc", mode: 'copy'
 
     input:
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
-    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    //file(starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
-    set val(projectName), file(starsolo:'starsolo/*') from alignment_logs.collect{it[1]}.ifEmpty([])
+    file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
+    file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
+    file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
-
-    when:
-    params.run_module.equals('complete') || params.run_module.equals('fastq') 
     
     output:
     file "*multiqc_report.html" into ch_multiqc_report
@@ -521,15 +479,13 @@ process multiqc {
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
-    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
     """
     multiqc -f $rtitle $rfilename $custom_config_file .
     """
 }
 
 /*
- * STEP 8 - Output Description HTML
+ * STEP 7 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
