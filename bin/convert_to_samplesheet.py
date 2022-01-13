@@ -17,7 +17,7 @@ def convert_to_samplesheet(in_file, out_file):
         engine='openpyxl'
     )
     # validate if mandatory variables are not missing
-    if not ex_sheet.iloc[:, ['project_id', 'sample_id', 'index_seq']].isnull().any().any():
+    if not ex_sheet.loc[:, ['project_id', 'sample_id', 'index_seq']].isnull().any().any():
        
         # hardcode header of sample sheet
         header_dict={
