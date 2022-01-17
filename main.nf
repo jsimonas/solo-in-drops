@@ -38,7 +38,7 @@ def helpMessage() {
       --solo_multi_mappers            Allow multi-gene read quantification. Can be set as "Uniform", "PropUnique", "EM", "Rescue" or any combination of these options
                                       More details can be found in STAR manual. Default: "Uniform"
 
-    bcl2fastq arguments:
+    bcl2fastq arguments:              If not specified, the default parameters will be used
       --barcode_mismatches            Allowed missmaches in library index for demultiplexing. Default: 1
       --write_fastq                   Output raw FASTQ files for each library. Default: false
     
@@ -464,7 +464,8 @@ process starsolo {
 process multiqc {
     tag "$runName"
     label 'process_low'
-    publishDir "${params.outdir}/multiqc", mode: 'copy'
+    publishDir "${params.outdir}/multiqc", mode: 'copy',
+      saveAs: { filename -> $runName_$filename }
 
     input:
     file (multiqc_config) from ch_multiqc_config
