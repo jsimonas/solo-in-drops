@@ -600,7 +600,7 @@ workflow.onComplete {
     if (!output_d.exists()) {
         output_d.mkdirs()
     }
-    def output_hf = new File(output_d, "pipeline_report.html")
+    def output_hf = new File(output_d, "{$runName}_pipeline_report.html")
     output_hf.withWriter { w -> w << email_html }
     def output_tf = new File(output_d, "pipeline_report.txt")
     output_tf.withWriter { w -> w << email_txt }
