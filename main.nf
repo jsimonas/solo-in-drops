@@ -602,7 +602,7 @@ workflow.onComplete {
     }
     def output_hf = new File(output_d, "${runName}_pipeline_report.html")
     output_hf.withWriter { w -> w << email_html }
-    def output_tf = new File(output_d, "pipeline_report.txt")
+    def output_tf = new File(output_d, "${runName}_pipeline_report.txt")
     output_tf.withWriter { w -> w << email_txt }
 
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
