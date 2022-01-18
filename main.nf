@@ -466,7 +466,7 @@ process multiqc {
     tag "$runName"
     label 'process_low'
     publishDir "${params.outdir}/multiqc", mode: 'copy',
-      saveAs: { filename -> "$runName"+"_"+"$filename" }
+      saveAs: { filename -> "${runName}_${filename}" }
 
     input:
     file (multiqc_config) from ch_multiqc_config
@@ -496,7 +496,7 @@ process multiqc {
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
-        saveAs: { filename -> "$runName"+"_"+"$filename" }
+        saveAs: { filename -> "${runName}_${filename}" }
 
     input:
     file output_docs from ch_output_docs
@@ -600,7 +600,7 @@ workflow.onComplete {
     if (!output_d.exists()) {
         output_d.mkdirs()
     }
-    def output_hf = new File(output_d, "{$runName}_pipeline_report.html")
+    def output_hf = new File(output_d, "${runName}_pipeline_report.html")
     output_hf.withWriter { w -> w << email_html }
     def output_tf = new File(output_d, "pipeline_report.txt")
     output_tf.withWriter { w -> w << email_txt }
