@@ -175,7 +175,7 @@ Channel.from(summary.collect{ [it.key, it.value] })
 process get_software_versions {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
         saveAs: { filename ->
-                      if (filename.indexOf(".csv") > 0) "$runName_$filename"
+                      if (filename.indexOf(".csv") > 0) filename
                       else null
                 }
 
@@ -465,7 +465,7 @@ process multiqc {
     tag "$runName"
     label 'process_low'
     publishDir "${params.outdir}/multiqc", mode: 'copy',
-      saveAs: { filename -> "$runName_$filename" }
+      saveAs: { filename -> $runName+"_"+$filename" }
 
     input:
     file (multiqc_config) from ch_multiqc_config
