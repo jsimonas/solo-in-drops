@@ -174,12 +174,11 @@ Channel.from(summary.collect{ [it.key, it.value] })
  */
 process get_software_versions {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
-        saveAs: { filename -> "$runName"+"_"+"$filename" }
-        
-//        saveAs: { filename ->
-//                      if (filename.indexOf(".csv") > 0) filename
-//                      else null
-//                }
+//        saveAs: { filename -> "$runName"+"_"+"$filename" }      
+        saveAs: { filename ->
+                      if (filename.indexOf(".csv") > 0) "$runName"+"_"+"$filename" 
+                      else null
+                }
 
     output:
     file 'software_versions_mqc.yaml' into ch_software_versions_yaml
