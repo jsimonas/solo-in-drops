@@ -465,7 +465,7 @@ process multiqc {
     tag "$runName"
     label 'process_low'
     publishDir "${params.outdir}/multiqc", mode: 'copy',
-      saveAs: { filename -> $runName+"_"+$filename" }
+      saveAs: { filename -> "$runName"+"_"+"$filename" }
 
     input:
     file (multiqc_config) from ch_multiqc_config
