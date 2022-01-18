@@ -495,7 +495,8 @@ process multiqc {
  * STEP 7 - Output Description HTML
  */
 process output_documentation {
-    publishDir "${params.outdir}/pipeline_info", mode: 'copy'
+    publishDir "${params.outdir}/pipeline_info", mode: 'copy',
+        saveAs: { filename -> "$runName"+"_"+"$filename" }
 
     input:
     file output_docs from ch_output_docs
