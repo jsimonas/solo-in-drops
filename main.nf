@@ -420,6 +420,7 @@ process starsolo {
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
     --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
+    --limitBAMsortRAM 1472473325 \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
     --soloMultiMappers ${params.solo_multi_mappers} \\
