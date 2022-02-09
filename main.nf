@@ -359,7 +359,7 @@ process mergefastq {
 if(params.run_module.equals('fastq')){
     merged_fastqc_paired_ch = Channel
         .fromFilePairs("$runDir/*_{bc,cdna}_001.fastq.gz", size: -1)
-        { file -> tags = (file.name =~ /(.+)(_\d+_S\d+)_\S+_001/)[0]; tags[1]+tags[2]+","+tags[1] }
+        { file -> tags = (file.name =~ /(.+)(_S\d+)_\S+_001/)[0]; tags[1]+tags[2]+","+tags[1] }
         .ifEmpty {
             error "Cannot find any reads matching bc_001.fastq.gz and cdna_001.fastq.gz in the: ${params.run_dir}"
         }
