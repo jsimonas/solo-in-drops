@@ -447,7 +447,7 @@ process starsolo {
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
     --soloMultiMappers ${params.solo_multi_mappers} \\
-    --soloFeatures Gene Velocyto GeneFull \\
+    --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
