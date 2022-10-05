@@ -98,9 +98,9 @@ runName = runDir.getName()
 
 // Assing mask parameter
 if (!params.scrna_protocol.equals("splitpool")){
-    mask = y*,I*,y*,y*
+    mask = 'y*,I*,y*,y*'
 } else {
-    mask = y*,I*,y*
+    mask = 'y*,I*,y*'
 }
 
 if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
