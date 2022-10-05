@@ -356,7 +356,7 @@ process mergefastq {
     } else if (params.scrna_protocol.equals("splitpool")){
     """
     zcat ${R1} \\
-    | awk 'NR%4==2 || NR%4==0{$0=substr($0,40,4)substr($0,1,4)substr($0,32,8)substr($0,18,10)substr($0,5,8)}1 ' \\
+    | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,40,4)substr(\$0,1,4)substr(\$0,32,8)substr(\$0,18,10)substr(\$0,5,8)}1 ' \\
     | gzip > ${prefix}_bc_001.fastq.gz
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
