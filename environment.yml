@@ -4,6 +4,7 @@ name: solo-in-drops-1.0dev
 channels:
   - conda-forge
   - bioconda
+  - Freenome
   - defaults
   
 dependencies:
@@ -19,5 +20,5 @@ dependencies:
   - bioconda::multiqc=1.9
   - bioconda::star=2.7.10a
   - bioconda::samtools=1.11
-#  - bioconda::seqkit=2.3.1
-#  - bioconda::bcl2fastq-nextseq=1.3.0
+  - bioconda::seqkit=2.3.1
+  - Freenome::bcl2fastq=2.20
