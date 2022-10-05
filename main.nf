@@ -253,7 +253,7 @@ process bcl_to_fastq {
 
     script:
     
-    if (!params.scrna_protocol.equals("splitpool"){
+    if (!params.scrna_protocol.equals("splitpool")){
     """
     bcl2fastq \\
     --runfolder-dir ${runDir} \\
