@@ -88,12 +88,20 @@ if (params.sample_sheet && (params.run_module.equals('complete') || params.run_m
     exit 1, "The extended sample sheet is not provided! Template of the file can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx"
 }
 
+// Check run directory
 if (params.run_dir){
     runDir = file(params.run_dir, checkIfExists: true)
     } else {
     exit 1, "Input directory not found!"
     }
 runName = runDir.getName()
+
+// Assing mask parameter
+if (!params.scrna_protocol.equals("splitpool")){
+    mask = y*,I*,y*,y*
+} else {
+    mask = y*,I*,y*
+}
 
 if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
@@ -253,7 +261,6 @@ process bcl_to_fastq {
 
     script:
     
-    if (!params.scrna_protocol.equals("splitpool")){
     """
     bcl2fastq \\
     --runfolder-dir ${runDir} \\
@@ -261,27 +268,12 @@ process bcl_to_fastq {
     --sample-sheet ${sheet} \\
     --mask-short-adapter-reads 0 \\
     --minimum-trimmed-read-length 0 \\
-    --use-bases-mask y*,I*,y*,y* \\
+    --use-bases-mask ${mask} \\
     --no-lane-splitting \\
     --create-fastq-for-index-reads \\
     --barcode-mismatches $params.barcode_mismatches \\
     --processing-threads $task.cpus
     """
-    } else {
-    """
-    bcl2fastq \\
-    --runfolder-dir ${runDir} \\
-    --output-dir . \\
-    --sample-sheet ${sheet} \\
-    --mask-short-adapter-reads 0 \\
-    --minimum-trimmed-read-length 0 \\
-    --use-bases-mask y*,I*,y* \\
-    --no-lane-splitting \\
-    --create-fastq-for-index-reads \\
-    --barcode-mismatches $params.barcode_mismatches \\
-    --processing-threads $task.cpus
-    """
-    }
 }
 
 // add project name
@@ -374,7 +366,7 @@ process mergefastq {
     zcat ${R1} \\
     | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,40,4)substr(\$0,1,4)substr(\$0,32,8)substr(\$0,18,10)substr(\$0,5,8)}1 ' \\
     | gzip > ${prefix}_bc_001.fastq.gz
-    cp ${R3} ${prefix}_cdna_001.fastq.gz
+    cp ${R2} ${prefix}_cdna_001.fastq.gz
     """
     }
 }
