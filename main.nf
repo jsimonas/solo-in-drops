@@ -22,11 +22,12 @@ def helpMessage() {
 
     Mandatory arguments:
       --run_dir [path/to/folder]      Path to input data (must be surrounded with quotes)
-      --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If the latter selected, sample sheet is not required. Default: "complete"
+      --run_module [str]              Pipeline module to run. Can be set as "complete", "demux" or "fastq". If the latter selected, sample sheet is not required. Default: "complete".
+      --scrna_protocol [str]          Protocol used to generate scRNA-seq libraries. Default: "indrops". Currently, customized "indrops" or "splitpool" protocols are supported.
       --sample_sheet [file]           Full path to extended sample sheet file. Example can be found at solo-in-drops/assets/extended_sample_sheet_template.xlsx
-      --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq", "novaseq", "miseq" or "hiseq2500"
-      --mode [str]                    STAR alignment mode. Default: "cell". Can be set as "bacteria" to switch off splice alignments
-      -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
+      --sequencer [str]               Sequencer used to generate the data. Default: "nextseq". Can be set as "nextseq" or "miseq".
+      --align_mode [str]              STAR alignment mode. Default: "cell". Can be set as "bacteria" to switch off splice alignments.
+      -profile [str]                  Configuration profile to use. Can use multiple (comma separated).
                                       Available: conda, docker and singularity
 
     References:                       If not specified in the configuration file or you wish to overwrite any of the references
@@ -127,7 +128,7 @@ summary['Run module']       = params.run_module
 summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
 summary['Sequencer']        = params.sequencer
-summary['Aligment mode']    = params.mode
+summary['Aligment mode']    = params.align_mode
 summary['Multi-mapper recovery'] = params.solo_multi_mappers
 summary['STAR index']       = params.star_index
 summary['CB whitelist']     = params.barcode_whitelist
@@ -336,7 +337,7 @@ process mergefastq {
     R2 = reads[1]
     R3 = reads[2]
     
-    if ( params.sequencer != "nextseq" ){
+    if (params.scrna_protocol.equals("indrops") && !params.sequencer.equals("nextseq")){
     """
     seqkit concat ${R2} ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
@@ -344,12 +345,19 @@ process mergefastq {
     --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
-    } else {
+    } else if (params.scrna_protocol.equals("indrops") && params.sequencer.equals("nextseq")){
     """
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
     --line-width 0 \\
     --threads $task.cpus
+    cp ${R3} ${prefix}_cdna_001.fastq.gz
+    """
+    } else if (params.scrna_protocol.equals("splitpool")){
+    """
+    zcat ${R1} \\
+    | awk 'NR%4==2 || NR%4==0{$0=substr($0,40,4)substr($0,1,4)substr($0,32,8)substr($0,18,10)substr($0,5,8)}1 ' \\
+    | gzip > ${prefix}_bc_001.fastq.gz
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
     }
@@ -406,7 +414,7 @@ process starsolo {
     bc_read = reads[0]
     cdna_read = reads[1]
     
-    if (params.mode.equals('bacteria')){
+    if (params.align_mode.equals('bacteria')){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -431,7 +439,7 @@ process starsolo {
     --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM     
     """
-    } else if (params.mode.equals('cell')){
+    } else if (params.align_mode.equals('cell')){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -455,8 +463,8 @@ process starsolo {
     --soloCBmatchWLtype 1MM 
     """
     }
-    else if (!(params.mode.equals('cell') || params.mode.equals('bacteria'))){
-        exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --mode parameter."
+    else if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
+        exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --align_mode parameter."
     }
 }
 
