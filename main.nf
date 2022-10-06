@@ -125,8 +125,10 @@ if (!params.scrna_protocol.equals("splitpool")){
 // STARsolo
 if (!params.scrna_protocol.equals("splitpool")){
     cb_length = 16
+    umi_start = 17
 } else {
     cb_length = 26
+    umi_start = 27
 }
 
 // Stage config files
@@ -473,8 +475,9 @@ process starsolo {
     --soloMultiMappers ${params.solo_multi_mappers} \\
     --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Simple \\
-    --soloUMIlen 8 \\
     --soloCBlen ${cb_length} \\
+    --soloUMIstart ${umi_start} \\
+    --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     """
