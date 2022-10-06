@@ -96,13 +96,6 @@ if (params.run_dir){
     }
 runName = runDir.getName()
 
-// Assing mask parameter
-if (!params.scrna_protocol.equals("splitpool")){
-    mask = 'y*,I*,y*,y*'
-} else {
-    mask = 'y*,I*,y*'
-}
-
 if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
     exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
 }
@@ -121,6 +114,21 @@ if( params.barcode_whitelist ){
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
+// Define scRNA protocol related parameters
+
+// bcl2fastq
+if (!params.scrna_protocol.equals("splitpool")){
+    mask = 'y*,I*,y*,y*'
+} else {
+    mask = 'y*,I*,y*'
+}
+// STARsolo
+if (!params.scrna_protocol.equals("splitpool")){
+    cb_length = 16
+} else {
+    cb_length = 26
+}
+
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
@@ -136,6 +144,7 @@ summary['Run module']       = params.run_module
 summary['Sample sheet']     = params.sample_sheet
 summary['Input directory']  = params.run_dir
 summary['Sequencer']        = params.sequencer
+summary['scRNAseq protocol']     = params.scrna_protocol
 summary['Aligment mode']    = params.align_mode
 summary['Multi-mapper recovery'] = params.solo_multi_mappers
 summary['STAR index']       = params.star_index
@@ -364,7 +373,7 @@ process mergefastq {
     } else if (params.scrna_protocol.equals("splitpool")){
     """
     zcat ${R1} \\
-    | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,40,4)substr(\$0,1,4)substr(\$0,32,8)substr(\$0,18,10)substr(\$0,5,8)}1 ' \\
+    | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,5,8)substr(\$0,18,10)substr(\$0,32,8)substr(\$0,1,4)substr(\$0,40,4)}1 ' \\
     | gzip > ${prefix}_bc_001.fastq.gz
     cp ${R2} ${prefix}_cdna_001.fastq.gz
     """
@@ -444,7 +453,6 @@ process starsolo {
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
-    --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM     
     """
     } else if (params.align_mode.equals('cell')){
@@ -466,8 +474,8 @@ process starsolo {
     --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
+    --soloCBlen ${cb_length}
     --soloBarcodeReadLength ${params.bc_read_length} \\
-    --soloUMIfiltering MultiGeneUMI \\
     --soloCBmatchWLtype 1MM 
     """
     }
