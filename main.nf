@@ -474,7 +474,7 @@ process starsolo {
     --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
-    --soloCBlen ${cb_length}
+    --soloCBlen ${cb_length} \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     """
