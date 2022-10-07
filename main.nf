@@ -356,7 +356,7 @@ process mergefastq {
     R2 = reads[1]
     R3 = reads[2]
     
-    if ((params.scrna_protocol.equals('indrops') && !params.sequencer.equals('nextseq'))){
+    if (params.scrna_protocol.equals('indrops') && params.sequencer.equals('miseq')){
     """
     seqkit concat ${R2} ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
@@ -364,7 +364,7 @@ process mergefastq {
     --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
-    } else if ((params.scrna_protocol.equals('indrops') && params.sequencer.equals('nextseq'))){
+    } else if (params.scrna_protocol.equals('indrops') && params.sequencer.equals('nextseq')){
     """
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
@@ -488,8 +488,6 @@ process starsolo {
     }
 }
 
-solo_summary_ch.view { "value: $it" }
-
 /*
  * STEP 6 - MultiQC 
  */
@@ -503,9 +501,9 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-    file (fastqc:"fastqc/*") from fastqc_results.collect()
+    file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
-//    file (starsolo:"starsolo/*_Solo.out/${params.solo_features}/*") from solo_summary_ch.collect().ifEmpty([])
+    file (starsolo:"*UMIperCellSorted.txt") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ("software_versions/*") from ch_software_versions_yaml.collect()
     
