@@ -427,6 +427,7 @@ process starsolo {
     file "*.bam"
     file "*.out" 
     set val(projectName), file("*.final.out") into alignment_logs
+    set val(projectName), file("*_Solo.out/${params.solo_features}/Summary.csv") into solo_summary_ch
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
@@ -502,6 +503,7 @@ process multiqc {
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
     file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
     file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
+    file solo_summary from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ('software_versions/*') from ch_software_versions_yaml.collect()
     

@@ -9,3 +9,17 @@ report_section_order:
         order: -1001
 
 export_plots: true
+
+# --------------------------------
+# Custom data
+# --------------------------------
+ 
+custom_data:
+    starsolo:
+        id: 'starsolo'
+        file_format: 'csv'
+        plot_type: 'generalstats'
+
+sp:
+    starsolo:
+        fn: 'Summary.csv'
