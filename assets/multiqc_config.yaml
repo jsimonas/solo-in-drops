@@ -15,11 +15,26 @@ export_plots: true
 # --------------------------------
  
 custom_data:
-    starsolo:
-        id: 'starsolo'
-        file_format: 'csv'
-        plot_type: 'generalstats'
+    starsolo_umi:
+        file_format: 'tsv'
+        plot_type: 'linegraph'
+        pconfig:
+            id: 'umi_rank_plot'
+            title: 'UMI per cell'
+            ylab: 'nUMI per cell'
+            xlab:  'cell rank'
+            xtype: 'logarithmic'
 
 sp:
-    starsolo:
-        fn: 'Summary.csv'
+  starsolo_umi:
+    fn: "UMIperCellSorted.txt"
+    
+#    starsolo:
+#        id: 'starsolo'
+#        file_format: 'csv'
+#        plot_type: 'generalstats'
+
+#sp:
+#    starsolo:
+#        fn: 'Summary.csv'
+
