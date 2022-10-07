@@ -20,9 +20,9 @@ custom_data:
         plot_type: 'linegraph'
         pconfig:
             id: 'umi_rank_plot'
-            title: 'UMI per cell'
-            ylab: 'nUMI per cell'
-            xlab:  'cell rank'
+            title: 'UMIs per cell'
+            ylab: 'UMI counts'
+            xlab: 'cell barcodes'
             xtype: 'logarithmic'
 
 sp:

@@ -488,6 +488,8 @@ process starsolo {
     }
 }
 
+solo_summary_ch.view { "value: $it" }
+
 /*
  * STEP 6 - MultiQC 
  */
@@ -503,7 +505,7 @@ process multiqc {
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
     file (fastqc:"fastqc/*") from fastqc_results.collect()
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
-    file (starsolo:"starsolo/*_Solo.out/${params.solo_features}/*") from solo_summary_ch.collect().ifEmpty([])
+//    file (starsolo:"starsolo/*_Solo.out/${params.solo_features}/*") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ("software_versions/*") from ch_software_versions_yaml.collect()
     
