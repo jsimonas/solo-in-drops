@@ -501,11 +501,11 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-    file (fastqc:'fastqc/*') from fastqc_results.collect().ifEmpty([])
-    file (starsolo:'starsolo/*') from alignment_logs.collect().ifEmpty([])
-    file solo_summary from solo_summary_ch.collect().ifEmpty([])
+    file (fastqc:"fastqc/*") from fastqc_results.collect()
+    file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
+    file (starsolo:"starsolo/*/${params.solo_features}/*") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
-    file ('software_versions/*') from ch_software_versions_yaml.collect()
+    file ("software_versions/*") from ch_software_versions_yaml.collect()
     
     output:
     file "*multiqc_report.html" into ch_multiqc_report
