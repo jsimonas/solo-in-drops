@@ -356,7 +356,7 @@ process mergefastq {
     R2 = reads[1]
     R3 = reads[2]
     
-    if ((params.scrna_protocol.equals("indrops") && !params.sequencer.equals("nextseq"))){
+    if ((params.scrna_protocol.equals('indrops') && !params.sequencer.equals('nextseq'))){
     """
     seqkit concat ${R2} ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
@@ -364,7 +364,7 @@ process mergefastq {
     --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
-    } else if ((params.scrna_protocol.equals("indrops") && params.sequencer.equals("nextseq"))){
+    } else if ((params.scrna_protocol.equals('indrops') && params.sequencer.equals('nextseq'))){
     """
     seqkit concat <(seqkit seq --reverse --complement --seq-type 'dna' ${R2}) ${R1} \\
     --out-file ${prefix}_bc_001.fastq.gz \\
@@ -372,7 +372,7 @@ process mergefastq {
     --threads $task.cpus
     cp ${R3} ${prefix}_cdna_001.fastq.gz
     """
-    } else if (params.scrna_protocol.equals("splitpool")){
+    } else if (params.scrna_protocol.equals('splitpool')){
     """
     zcat ${R1} \\
     | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,5,8)substr(\$0,18,10)substr(\$0,32,8)substr(\$0,1,4)substr(\$0,40,4)}1 ' \\
