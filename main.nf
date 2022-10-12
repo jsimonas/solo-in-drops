@@ -96,8 +96,8 @@ if (params.run_dir){
     }
 runName = runDir.getName()
 
-if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('novaseq') || params.sequencer.equals('hiseq') || params.sequencer.equals('miseq'))){
-    exit 1, "Unsupported sequencer provided! Can be set as nextseq, novaseq, miseq or hiseq"
+if (!(params.sequencer.equals('nextseq') || params.sequencer.equals('miseq'))){
+    exit 1, "Unsupported sequencer provided! Currently nextseq or miseq are supported"
 }
 
 // Check STAR index
@@ -130,6 +130,17 @@ if (!params.scrna_protocol.equals("splitpool")){
     cb_length = 26
     umi_start = 27
 }
+
+if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
+    exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --align_mode parameter."
+} else if (params.align_mode.equals('cell')){
+    twopass = 'Basic'
+    alignintronmax = 0
+} else if (params.align_mode.equals('bacteria')){
+    twopass = 'None'
+    alignintronmax = 1
+}
+
 
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
@@ -434,7 +445,6 @@ process starsolo {
     bc_read = reads[0]
     cdna_read = reads[1]
     
-    if (params.align_mode.equals('bacteria')){
     """
     STAR \\
     --genomeDir ${index} \\
@@ -442,48 +452,12 @@ process starsolo {
     --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
-    --alignIntronMax 1 \\
-    --outFilterMatchNmin 0 \\
+    --alignIntronMax ${alignintronmax} \\
     --outSAMunmapped Within \\
     --outSAMtype BAM SortedByCoordinate \\
     --outBAMsortingBinsN 20 \\
     --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
-    --limitBAMsortRAM 1472473325 \\
-    --runDirPerm All_RWX \\
-    --readFilesCommand zcat \\
-    --soloMultiMappers ${params.solo_multi_mappers} \\
-    --soloFeatures ${params.solo_features} \\
-    --soloType CB_UMI_Simple \\
-    --soloUMIlen 8 \\
-    --soloBarcodeReadLength ${params.bc_read_length} \\
-    --soloCBmatchWLtype 1MM
-    
-    awk '{print NR "\t" \$0}' \\ 
-    ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
-    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
-    
-    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\ 
-    ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
-    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_Features.stats
-    
-    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\
-    ${prefix}_Solo.out/Barcodes.stats \\
-    > ${prefix}_Solo.out/${prefix}_Barcodes.stats
-    
-    """
-    } else if (params.align_mode.equals('cell')){
-    """
-    STAR \\
-    --genomeDir ${index} \\
-    --readFilesIn ${cdna_read} ${bc_read} \\
-    --soloCBwhitelist ${whitelist} \\
-    --runThreadN ${task.cpus} \\
-    --outFileNamePrefix ${prefix}_ \\
-    --outSAMunmapped Within \\
-    --outSAMtype BAM SortedByCoordinate \\
-    --outBAMsortingBinsN 20 \\
-    --outSAMattributes NH HI nM AS CR UR CB UB sS sQ sM GX GN \\
-    --twopassMode Basic \\
+    --twopassMode ${twopass} \\
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
     --soloMultiMappers ${params.solo_multi_mappers} \\
@@ -499,19 +473,15 @@ process starsolo {
     ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
     
-    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\ 
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' \\ 
     ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_Features.stats
     
-    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' \\
     ${prefix}_Solo.out/Barcodes.stats \\
     > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
     """
-    }
-    else if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
-        exit 1, "Provided alingment mode is not supported! Please use 'cell' or 'bacteria' for --align_mode parameter."
-    }
 }
 
 /*
