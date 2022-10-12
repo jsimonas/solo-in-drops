@@ -320,8 +320,6 @@ process fastqc {
     """
 }
 
-fastqc_results.view()
-
 // make paired channel for fastqs
 fastqs_output_ch.flatMap()
             .map{ file ->
@@ -460,8 +458,17 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM
     
-    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
+    awk '{print NR "\t" \$0}' \\ 
+    ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
+    
+    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\ 
+    ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
+    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_Features.stats
+    
+    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\
+    ${prefix}_Solo.out/Barcodes.stats \\
+    > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
     """
     } else if (params.align_mode.equals('cell')){
@@ -488,8 +495,17 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     
-    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
+    awk '{print NR "\t" \$0}' \\ 
+    ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
+    
+    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\ 
+    ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
+    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_Features.stats
+    
+    awk 'gsub(/^\s+/,"", $0)gsub(/\s+/,"\t")' \\
+    ${prefix}_Solo.out/Barcodes.stats \\
+    > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
     """
     }
@@ -511,7 +527,7 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-//    file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
+    file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")

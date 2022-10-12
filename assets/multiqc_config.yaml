@@ -11,30 +11,45 @@ report_section_order:
 export_plots: true
 
 # --------------------------------
-# Custom data
+# custom data
 # --------------------------------
- 
+
 custom_data:
     starsolo_umi:
+        parent_id: 'starsolo'
+        parent_name: 'STARsolo' 
         file_format: 'tsv'
         plot_type: 'linegraph'
         pconfig:
-            id: 'umi_rank_plot'
-            title: 'UMIs per cell'
+            id: 'starsolo_umi'
+            title: 'Barcode rank plot'
             ylab: 'UMI counts'
-            xlab: 'cell barcodes'
-            xtype: 'logarithmic'
+            xlab: 'Cell Barcodes'
+            yLog: True
+            xLog: True
+    starsolo_barcode:
+        parent_id: 'starsolo'
+        parent_name: 'STARsolo' 
+        file_format: 'tsv'
+        plot_type: 'bargraph'
+        pconfig:
+            id: 'starsolo_barcode'
+            title: 'Barcode Stats'
+            xlab: '# Reads'
+    starsolo_feature:
+        parent_id: 'starsolo'
+        parent_name: 'STARsolo' 
+        file_format: 'tsv'
+        plot_type: 'bargraph'
+        pconfig:
+            id: 'starsolo_feature'
+            title: 'Feature Stats'
+            xlab: '# Reads'
 
 sp:
   starsolo_umi:
-    fn: "UMIperCellSorted.txt"
-    
-#    starsolo:
-#        id: 'starsolo'
-#        file_format: 'csv'
-#        plot_type: 'generalstats'
-
-#sp:
-#    starsolo:
-#        fn: 'Summary.csv'
-
+    fn: '*UMIperCellSorted.txt'
+  starsolo_barcode:
+    fn: '*Barcodes.stats'
+  starsolo_barcode:
+    fn: '*Features.stats'
