@@ -301,7 +301,7 @@ fastqs_ch = fastqs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
  * STEP 3 - FastQC
  */
 process fastqc {
-    tag "$fastqc"
+    tag "$prefix"
     label 'process_medium'
     publishDir "${params.outdir}/${projectName}/fastqc", mode: 'copy'
         
@@ -319,6 +319,8 @@ process fastqc {
     fastqc --quiet --threads $task.cpus ${fastq}
     """
 }
+
+fastqc_results.view()
 
 // make paired channel for fastqs
 fastqs_output_ch.flatMap()
@@ -509,7 +511,7 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-    file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
+//    file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
