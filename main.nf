@@ -294,19 +294,19 @@ fqname_fqfile_ch = fastqs_fqc_ch.map{
 undetermined_fqfile_ch = und_fastqs_fqc_ch.map{
     file -> ["Undetermined", file]
 }
-fastqcs = Channel.empty()
-fastqcs_ch = fastqcs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
+fastqs = Channel.empty()
+fastqs_ch = fastqs.mix(fqname_fqfile_ch, undetermined_fqfile_ch)
 
 /*
  * STEP 3 - FastQC
  */
 process fastqc {
-    tag "$fastq"
+    tag "$fastqc"
     label 'process_medium'
     publishDir "${params.outdir}/${projectName}/fastqc", mode: 'copy'
         
     input:
-    set val(projectName), file(fastq) from fastqcs_ch
+    set val(projectName), file(fastq) from fastqs_ch
 
     when:
     params.run_module.equals('complete') || params.run_module.equals('demux')
@@ -349,7 +349,7 @@ process mergefastq {
     params.run_module.equals('complete') || params.run_module.equals('demux') 
 
     output:
-    set val(prefix), val(projectName), file('*_{bc,cdna}_001.fastq.gz') into merged_fastqc_ch
+    set val(prefix), val(projectName), file('*_{bc,cdna}_001.fastq.gz') into merged_fastq_ch
     
     script:
     R1 = reads[0]
@@ -384,7 +384,7 @@ process mergefastq {
 
 // assign merged fastq channel
 if(params.run_module.equals('fastq')){
-    merged_fastqc_paired_ch = Channel
+    merged_fastq_paired_ch = Channel
         .fromFilePairs("$runDir/*_{bc,cdna}_001.fastq.gz", size: -1)
         { file -> tags = (file.name =~ /(.+)(_S\d+)_\S+_001/)[0]; tags[1]+tags[2]+","+tags[1] }
         .ifEmpty {
@@ -394,7 +394,7 @@ if(params.run_module.equals('fastq')){
             tag, pair -> tags = tag.split(/,/) ; [tags[0], tags[1], pair] 
         }
 } else {
-    merged_fastqc_paired_ch = merged_fastqc_ch
+    merged_fastq_paired_ch = merged_fastq_ch
 }
 
 /*
@@ -416,7 +416,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastqc_paired_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
     file index from star_index.collect()
     file whitelist from barcode_whitelist.collect()
 
@@ -427,7 +427,7 @@ process starsolo {
     file "*.bam"
     file "*.out" 
     set val(projectName), file("*.final.out") into alignment_logs
-    set val(projectName), file("*_Solo.out/${params.solo_features}/UMIperCellSorted.txt") into solo_summary_ch
+    set val(projectName), file("*_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt") into solo_summary_ch
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
@@ -456,7 +456,11 @@ process starsolo {
     --soloType CB_UMI_Simple \\
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
-    --soloCBmatchWLtype 1MM     
+    --soloCBmatchWLtype 1MM
+    
+    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
+    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
+    
     """
     } else if (params.align_mode.equals('cell')){
     """
@@ -481,6 +485,10 @@ process starsolo {
     --soloUMIlen 8 \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
+    
+    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
+    > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
+    
     """
     }
     else if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
@@ -503,7 +511,7 @@ process multiqc {
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
     file (fastqc:"fastqc/*") from fastqc_results.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
-    file (starsolo:"*UMIperCellSorted.txt") from solo_summary_ch.collect().ifEmpty([])
+    file (starsolo:"starsolo/*") from solo_summary_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ("software_versions/*") from ch_software_versions_yaml.collect()
     
@@ -517,6 +525,7 @@ process multiqc {
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
     """
+    echo $custom_config_file
     multiqc -f $rtitle $rfilename $custom_config_file .
     """
 }
