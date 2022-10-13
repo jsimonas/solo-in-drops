@@ -439,6 +439,7 @@ process starsolo {
     set val(projectName), file("*.final.out") into alignment_logs
     set val(projectName), file("*_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt") into umi_barcode_ch
     set val(projectName), file("*_Solo.out/${params.solo_features}/${prefix}_Features.stats") into features_stats_ch
+    set val(projectName), file("*_Solo.out/${prefix}_Barcodes.stats") into barcodes_stats_ch
 
     script:
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
@@ -481,8 +482,6 @@ process starsolo {
     """
 }
 
-features_stats_ch.view()
-
 /*
  * STEP 6 - MultiQC 
  */
@@ -496,9 +495,11 @@ process multiqc {
     file (multiqc_config) from ch_multiqc_config
     file (mqc_custom_config) from ch_multiqc_custom_config.collect().ifEmpty([])
     file bcl2fq_stats from bcl2fq_stats_ch.collect().ifEmpty([])
-    file (fastqc:"fastqc/*") from fastqc_results_ch.collect().ifEmpty([])
+    file (fastqc:"fastqc/*") from fastqc_results_ch.flatten().collect().ifEmpty([])
     file (starsolo:"starsolo/*") from alignment_logs.collect().ifEmpty([])
     file (starsolo:"starsolo/*") from umi_barcode_ch.collect().ifEmpty([])
+    file (starsolo:"starsolo/*") from features_stats_ch.collect().ifEmpty([])
+    file (starsolo:"starsolo/*") from barcodes_stats_ch.collect().ifEmpty([])
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
     file ("software_versions/*") from ch_software_versions_yaml.collect()
     
