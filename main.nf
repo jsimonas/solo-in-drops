@@ -141,7 +141,6 @@ if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria')))
     alignintronmax = 1
 }
 
-
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
@@ -469,16 +468,13 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     
-    awk '{print NR "\t" \$0}' \\ 
-    ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
+    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_UMIperCellSorted.txt
     
-    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' \\ 
-    ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/${params.solo_features}/Features.stats \\
     > ${prefix}_Solo.out/${params.solo_features}/${prefix}_Features.stats
     
-    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' \\
-    ${prefix}_Solo.out/Barcodes.stats \\
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/Barcodes.stats \\
     > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
     """
@@ -512,8 +508,8 @@ process multiqc {
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
+    custom_config_file.view()
     """
-    echo $custom_config_file
     multiqc -f $rtitle $rfilename $custom_config_file .
     """
 }
