@@ -51,5 +51,5 @@ sp:
     fn: '*UMIperCellSorted.txt'
   starsolo_barcode:
     fn: '*Barcodes.stats'
-  starsolo_barcode:
+  starsolo_feature:
     fn: '*Features.stats'
