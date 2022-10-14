@@ -53,3 +53,11 @@ sp:
     fn: '*Barcodes.stats'
   starsolo_feature:
     fn: '*Features.stats'
+    
+extra_fn_clean_exts:
+    - type: 'replace'
+      pattern: '_UMIperCellSorted.txt'
+    - type: 'replace'
+      pattern: '_Barcodes.stats'
+    - type: 'replace'
+      pattern: '_Features.stats'
