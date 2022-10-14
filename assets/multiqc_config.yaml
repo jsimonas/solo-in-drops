@@ -10,6 +10,10 @@ report_section_order:
 
 export_plots: true
 
+top_modules:
+  - 'star'
+  - 'starsolo'
+
 # --------------------------------
 # custom data
 # --------------------------------
@@ -48,11 +52,11 @@ custom_data:
 
 sp:
   starsolo_umi:
-    fn: '*UMIperCellSorted.txt'
+    fn: '*_UMIperCellSorted.txt'
   starsolo_barcode:
-    fn: '*Barcodes.stats'
+    fn: '*_Barcodes.stats'
   starsolo_feature:
-    fn: '*Features.stats'
+    fn: '*_Features.stats'
     
 extra_fn_clean_exts:
     - type: 'replace'
