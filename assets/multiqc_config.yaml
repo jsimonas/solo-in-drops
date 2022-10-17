@@ -72,3 +72,5 @@ extra_fn_clean_exts:
       pattern: '_Barcodes.stats'
     - type: 'replace'
       pattern: '_Features.stats'
+    - type: 'replace'
+      pattern: '_Summary.csv''
