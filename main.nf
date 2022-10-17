@@ -478,8 +478,8 @@ process starsolo {
     awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/Barcodes.stats \\
     > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
-    awk 'BEGIN{print ",${prefix}"}{print}' ${prefix}_Solo.out/${params.solo_features}/Summary.csv \\
-    | awk 'BEGIN {FS=OFS=","}{for (f=1;f<=NF;f++) col[f] = col[f]","\$f} END {for (f=1;f<=NF;f++) print col[f]}' \\
+    awk 'BEGIN{print "Sample Name,${prefix}"}{print}' ${prefix}_Solo.out/${params.solo_features}/Summary.csv \\
+    | awk 'BEGIN{FS=","}{for (f=1;f<=NF;f++) col[f] = col[f]","\$f} END{for (f=1;f<=NF;f++) print col[f]}' \\
     >  ${prefix}_Solo.out/${params.solo_features}/${prefix}_Summary.csv
     
     """
