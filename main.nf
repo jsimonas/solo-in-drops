@@ -482,8 +482,7 @@ process starsolo {
     #| awk 'BEGIN{FS=","}{for (f=1;f<=NF;f++) col[f] = col[f]","\$f} END{for (f=1;f<=NF;f++) print col[f]}' \\
     #>  ${prefix}_Solo.out/${params.solo_features}/${prefix}_Summary.csv
     
-    awk 'BEGIN{FS=","}{for (i=1;i<=NF;i++) col[i] = col[i]","\$i} END{for (i=1;i<=NF;i++) print col[i]}' \\ 
-    ${prefix}_Solo.out/${params.solo_features}/Summary.csv \\
+    awk 'BEGIN{FS=","}{for (i=1;i<=NF;i++) col[i] = col[i]","\$i} END{for (i=1;i<=NF;i++) print col[i]}' ${prefix}_Solo.out/${params.solo_features}/Summary.csv \\
     | awk 'BEGIN{FS=OFS=""}NR==1{print "Sample Name" OFS \$0}NR==2{print "${prefix}" OFS \$0}' \\
     >  ${prefix}_Solo.out/${params.solo_features}/${prefix}_Summary.csv
     
