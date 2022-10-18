@@ -50,10 +50,10 @@ custom_data:
             title: 'Feature Stats'
             xlab: '# Reads'
     starsolo_summary:
-#        parent_id: 'starsolo'
-#        parent_name: 'STARsolo' 
+        parent_id: 'starsolo'
+        parent_name: 'STARsolo' 
         file_format: 'csv'
-        plot_type: 'generalstats'
+        plot_type: 'table'
 
 sp:
     starsolo_umi:
