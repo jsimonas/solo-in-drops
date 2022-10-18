@@ -19,6 +19,11 @@ top_modules:
 # --------------------------------
 
 custom_data:
+    starsolo_summary:
+        parent_id: 'starsolo'
+        parent_name: 'STARsolo' 
+        file_format: 'csv'
+        plot_type: 'table'
     starsolo_umi:
         parent_id: 'starsolo'
         parent_name: 'STARsolo' 
@@ -49,28 +54,23 @@ custom_data:
             id: 'starsolo_feature'
             title: 'Feature Stats'
             xlab: '# Reads'
-    starsolo_summary:
-        parent_id: 'starsolo'
-        parent_name: 'STARsolo' 
-        file_format: 'csv'
-        plot_type: 'table'
 
 sp:
+    starsolo_summary:
+        fn: '*_Summary.csv'
     starsolo_umi:
         fn: '*_UMIperCellSorted.txt'
     starsolo_barcode:
         fn: '*_Barcodes.stats'
     starsolo_feature:
         fn: '*_Features.stats'
-    starsolo_summary:
-        fn: '*_Summary.csv'
     
 extra_fn_clean_exts:
+    - type: 'replace'
+      pattern: '_Summary.csv'
     - type: 'replace'
       pattern: '_UMIperCellSorted.txt'
     - type: 'replace'
       pattern: '_Barcodes.stats'
     - type: 'replace'
       pattern: '_Features.stats'
-    - type: 'replace'
-      pattern: '_Summary.csv'
