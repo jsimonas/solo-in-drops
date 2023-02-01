@@ -18,7 +18,7 @@ dependencies:
   - conda-forge::openpyxl=3.0.9
   - bioconda::fastqc=0.11.8
   - bioconda::multiqc=1.9
-  - bioconda::star=2.7.10a
+  - bioconda::star=2.7.10b
   - bioconda::samtools=1.11
   - bioconda::seqkit=2.0.0
   - Freenome::bcl2fastq=2.20
