@@ -469,7 +469,7 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     
-    feature=$(echo "$params.solo_features" | sed 's/\s.*\$//')
+    feature="\$(echo "$params.solo_features" | sed 's/\s.*\$//')"
     
     awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${feature}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${feature}/${prefix}_UMIperCellSorted.txt
