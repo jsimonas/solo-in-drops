@@ -469,8 +469,8 @@ process starsolo {
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype 1MM 
     
-    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${params.solo_features\%[[:space:]]*}/UMIperCellSorted.txt \\
-    > ${prefix}_Solo.out/${params.solo_features\%[[:space:]]*}/${prefix}_UMIperCellSorted.txt
+    awk '{print NR "\t" \$0}' ${prefix}_Solo.out/"${params.solo_features\%[[:space:]]*}"/UMIperCellSorted.txt \\
+    > ${prefix}_Solo.out/"${params.solo_features%[[:space:]]*}"/${prefix}_UMIperCellSorted.txt
     
     awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/\${params.solo_features%[[:space:]]*}/Features.stats \\
     > ${prefix}_Solo.out/\${params.solo_features%[[:space:]]*}/${prefix}_Features.stats
