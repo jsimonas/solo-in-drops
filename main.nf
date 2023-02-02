@@ -474,15 +474,15 @@ process starsolo {
     awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${feature}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${feature}/${prefix}_UMIperCellSorted.txt
     
-    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/\${feature}/Features.stats \\
-    > ${prefix}_Solo.out/\${feature}/${prefix}_Features.stats
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/${feature}/Features.stats \\
+    > ${prefix}_Solo.out/${feature}/${prefix}_Features.stats
     
     awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/Barcodes.stats \\
     > ${prefix}_Solo.out/${prefix}_Barcodes.stats
     
-    awk 'BEGIN{FS=","}{for (i=1;i<=NF;i++) col[i] = col[i]","\$i} END{for (i=1;i<=NF;i++) print col[i]}' ${prefix}_Solo.out/\${feature}/Summary.csv \\
+    awk 'BEGIN{FS=","}{for (i=1;i<=NF;i++) col[i] = col[i]","\$i} END{for (i=1;i<=NF;i++) print col[i]}' ${prefix}_Solo.out/${feature}/Summary.csv \\
     | awk 'BEGIN{FS=OFS=""}NR==1{print "Sample Name" OFS \$0}NR==2{print "${prefix}" OFS \$0}' \\
-    >  ${prefix}_Solo.out/\${feature}/${prefix}_Summary.csv
+    >  ${prefix}_Solo.out/${feature}/${prefix}_Summary.csv
     
     """
 }
