@@ -37,7 +37,7 @@ def helpMessage() {
     STARsolo arguments:               If not specified, the default parameters will be used
       --bc_read_length [int]          Read length of cell barcode read. Default: equal to sum of BC + UMI
       --solo_multi_mappers            Allow multi-gene read quantification. Can be set as "Uniform", "PropUnique", "EM", "Rescue" or any combination of these options. Default: "Uniform"
-      --solo_features                 Counting option for transcriptomic features, including "Gene" (default), "GeneFull", and "Velocyto" or any combination of these options.                
+      --solo_features                 Counting option for transcriptomic features, including "Gene" (default), "GeneFull", and "Velocyto" or any combination of these options. Combinations should be provided in one string, i.e. "Gene Velocyto".           
 
     bcl2fastq arguments:              If not specified, the default parameters will be used
       --barcode_mismatches            Allowed missmaches in library index for demultiplexing. Default: 1
@@ -437,7 +437,7 @@ process starsolo {
     file "*.bam"
     file "*.out" 
     set val(projectName), file("*.final.out") into alignment_logs
-    set val(projectName), file("*_Solo.out/${params.solo_features}.split('\s')[0]/${prefix}_*.{stats,txt,csv}") into features_stats_ch
+    set val(projectName), file("*_Solo.out/*/${prefix}_*.{stats,txt,csv}") into features_stats_ch
     set val(projectName), file("*_Solo.out/${prefix}_Barcodes.stats") into barcodes_stats_ch
 
     script:
