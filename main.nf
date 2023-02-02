@@ -474,7 +474,7 @@ process starsolo {
     awk '{print NR "\t" \$0}' ${prefix}_Solo.out/${feature}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/${feature}/${prefix}_UMIperCellSorted.txt
     
-    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/\${params.solo_features%[[:space:]]*}/Features.stats \\
+    awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/\${feature}/Features.stats \\
     > ${prefix}_Solo.out/\${feature}/${prefix}_Features.stats
     
     awk 'gsub(/^\s+/,"", \$0)gsub(/\s+/,"\t")' ${prefix}_Solo.out/Barcodes.stats \\
