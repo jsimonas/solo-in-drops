@@ -437,7 +437,7 @@ process starsolo {
     file "*.bam"
     file "*.out" 
     set val(projectName), file("*.final.out") into alignment_logs
-    set val(projectName), file("*_Solo.out/*/${prefix}_*.{stats,txt,csv}") into features_stats_ch
+    set val(projectName), file("*_Solo.out/${params.solo_features}.split('\s')[0]/${prefix}_*.{stats,txt,csv}") into features_stats_ch
     set val(projectName), file("*_Solo.out/${prefix}_Barcodes.stats") into barcodes_stats_ch
 
     script:
