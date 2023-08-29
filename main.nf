@@ -103,7 +103,7 @@ if( params.star_index ){
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromFilePairs(params.barcode_whitelist)
-        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }.
+        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
         .flatten().findAll { it instanceof String }
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
