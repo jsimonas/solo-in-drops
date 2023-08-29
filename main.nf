@@ -430,7 +430,7 @@ process starsolo {
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
 //    set val(bc_version), file(whitelist) from barcode_whitelist
-    path whitelist from barcode_whitelist.collect()
+    path whitelist from barcode_whitelist
     file index from star_index.collect()
 
     when:
