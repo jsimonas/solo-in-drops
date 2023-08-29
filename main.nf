@@ -134,7 +134,7 @@ if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria')))
 }
 
 // make sure that solo_features is a one string
-params.solo_features.join(' ').view()
+println params.solo_features.join(' ')
 
 
 // Stage config files
