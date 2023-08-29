@@ -133,10 +133,6 @@ if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria')))
     alignintronmax = 1
 }
 
-// make sure that solo_features is a one string
-println params.solo_features.join(' ')
-
-
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
@@ -458,14 +454,14 @@ process starsolo {
     --runDirPerm All_RWX \\
     --readFilesCommand zcat \\
     --soloMultiMappers ${params.solo_multi_mappers} \\
-    --soloFeatures ${solo_features} \\
+    --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Complex \\
     --soloCBposition ${cb_position} \\
     --soloUMIposition ${umi_position} \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
     --soloCBmatchWLtype EditDist_2 
     
-    feature="\$(echo "${solo_features}" | sed 's/\s.*\$//')"
+    feature="\$(echo "$params.solo_features" | sed 's/\s.*\$//')"
     
     awk '{print NR "\t" \$0}' ${prefix}_Solo.out/\${feature}/UMIperCellSorted.txt \\
     > ${prefix}_Solo.out/\${feature}/${prefix}_UMIperCellSorted.txt
