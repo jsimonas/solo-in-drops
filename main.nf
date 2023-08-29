@@ -155,7 +155,6 @@ summary['Sequencer']        = params.sequencer
 summary['scRNAseq protocol']     = params.scrna_protocol
 summary['Aligment mode']    = params.align_mode
 summary['Multi-mapper recovery'] = params.solo_multi_mappers
-// summary['STARsolo features'] = params.params.solo_features
 summary['STAR index']       = params.star_index
 summary['CB whitelist']     = params.barcode_whitelist
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
