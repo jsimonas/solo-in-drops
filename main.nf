@@ -103,7 +103,7 @@ if( params.star_index ){
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromFilePairs(params.barcode_whitelist)
-        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
+//        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
@@ -429,7 +429,7 @@ process starsolo {
 
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
-    path(whitelist) from barcode_whitelist
+    set val(bc_version), file(whitelist) from barcode_whitelist
     file index from star_index.collect()
 
     when:
