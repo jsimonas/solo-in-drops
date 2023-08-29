@@ -110,10 +110,7 @@ if( params.barcode_whitelist ){
 
 if( params.barcode_whitelist ){
     bbarcode_whitelist = Channel
-        .fromFilePairs(params.barcode_whitelist)
-        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
-        .flatten().findAll { it instanceof String }
-    //    .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+        .fromPath(params.barcode_whitelist)
 }
 
 println "Flattened List: $bbarcode_whitelist"
