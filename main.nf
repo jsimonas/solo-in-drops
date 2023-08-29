@@ -113,7 +113,7 @@ if( params.barcode_whitelist ){
         .fromPath(params.barcode_whitelist)
 }
 
-println "Flattened List: $bbarcode_whitelist"
+//println "Flattened List: $bbarcode_whitelist"
 
 //if( params.barcode_whitelist ){
 //    bbarcode_whitelist = Channel
