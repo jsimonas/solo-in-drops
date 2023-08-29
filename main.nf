@@ -111,7 +111,10 @@ if( params.barcode_whitelist ){
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
-bbarcode_whitelist.map{ it instanceof List ? it.join(' ') : it }.view()
+bbarcode_whitelist.collect {
+    it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it
+}.view()
+
 
 // Define scRNA protocol related parameters
 
