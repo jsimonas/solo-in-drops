@@ -100,6 +100,7 @@ if( params.star_index ){
 }
 
 //Check barcode whitelist
+// list > join > path
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromPath(params.barcode_whitelist)
@@ -420,7 +421,6 @@ process starsolo {
 
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
-//    set val(bc_version), file(whitelist) from barcode_whitelist
     path whitelist from barcode_whitelist.collect()
     file index from star_index.collect()
 
