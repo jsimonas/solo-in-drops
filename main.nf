@@ -110,7 +110,7 @@ if( params.barcode_whitelist ){
         .fromFilePairs(params.barcode_whitelist)
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
-bbarcode_whitelist.collect().toString()
+bbarcode_whitelist.collect().toString().view()
 
 // bc_wl = whitelist.join(' ')
 
