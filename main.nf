@@ -107,6 +107,14 @@ if( params.barcode_whitelist ){
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
+if( params.barcode_whitelist ){
+    bbarcode_whitelist = Channel
+        .fromPath(params.barcode_whitelist).buffer(size: 3)
+        .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+}
+bbarcode_whitelist.view()
+
+
 // Define scRNA protocol related parameters
 
 // bcl2fastq
