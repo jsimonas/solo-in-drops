@@ -134,8 +134,8 @@ if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria')))
     alignintronmax = 1
 }
 
-// make sure that solo_features is a string
-params.solo_features = params.solo_features.toString()
+// make sure that solo_features is a one string
+params.solo_features = params.solo_features.join(' ')
 
 // Stage config files
 ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
