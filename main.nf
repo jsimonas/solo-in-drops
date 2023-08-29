@@ -100,16 +100,16 @@ if( params.star_index ){
 }
 
 //Check barcode whitelist
-if( params.barcode_whitelist ){
-    barcode_whitelist = Channel
-        .fromFilePairs(params.barcode_whitelist)
-        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
-        .flatten().findAll { it instanceof String }
-    //    .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
-}
+//if( params.barcode_whitelist ){
+//    barcode_whitelist = Channel
+//        .fromFilePairs(params.barcode_whitelist)
+//        .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
+//        .flatten().findAll { it instanceof String }
+//    //    .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+//}
 
 if( params.barcode_whitelist ){
-    bbarcode_whitelist = Channel
+    barcode_whitelist = Channel
         .fromPath(params.barcode_whitelist)
 }
 
