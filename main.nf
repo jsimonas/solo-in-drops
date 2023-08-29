@@ -427,8 +427,8 @@ process starsolo {
 
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
+    file(whitelist) from barcode_whitelist
     file index from star_index.collect()
-    file whitelist from barcode_whitelist.collect()
 
     when:
     !(params.run_module.equals('demux')) 
@@ -444,12 +444,13 @@ process starsolo {
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
     bc_read = reads[0]
     cdna_read = reads[1]
+    bc_wl = whitelist.join(' ')
     
     """
     STAR \\
     --genomeDir ${index} \\
     --readFilesIn ${cdna_read} ${bc_read} \\
-    --soloCBwhitelist ${whitelist} \\
+    --soloCBwhitelist ${bc_wl} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
     --alignIntronMax ${alignintronmax} \\
