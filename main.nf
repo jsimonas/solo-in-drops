@@ -105,7 +105,7 @@ if( params.barcode_whitelist ){
         .fromFilePairs(params.barcode_whitelist)
         .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
         .flatten().findAll { it instanceof String }
-        .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+    //    .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
 //if( params.barcode_whitelist ){
