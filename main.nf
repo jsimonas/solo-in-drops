@@ -104,7 +104,7 @@ if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromFilePairs(params.barcode_whitelist)
         .view()
-        \\ .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
+        //.ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
 // Define scRNA protocol related parameters
