@@ -110,7 +110,9 @@ if( params.barcode_whitelist ){
         .fromFilePairs(params.barcode_whitelist)
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
-bbarcode_whitelist.collect().view()
+bbarcode_whitelist.collect().toString()
+
+#bc_wl = whitelist.join(' ')
 
 
 // Define scRNA protocol related parameters
