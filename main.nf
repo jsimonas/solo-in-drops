@@ -102,7 +102,7 @@ if( params.star_index ){
 //Check barcode whitelist
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
-        .fromPath(params.barcode_whitelist)
+        .fromFilePairs(params.barcode_whitelist)
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
 
