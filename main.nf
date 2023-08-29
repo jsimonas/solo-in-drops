@@ -112,7 +112,7 @@ if( params.barcode_whitelist ){
 }
 bbarcode_whitelist.collect().toString()
 
-#bc_wl = whitelist.join(' ')
+// bc_wl = whitelist.join(' ')
 
 
 // Define scRNA protocol related parameters
