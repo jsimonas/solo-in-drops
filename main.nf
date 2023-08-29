@@ -103,17 +103,9 @@ if( params.star_index ){
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromFilePairs(params.barcode_whitelist)
-        .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
-}
-if( params.barcode_whitelist ){
-    bbarcode_whitelist = Channel
-        .fromFilePairs(params.barcode_whitelist)
         .collect { it instanceof List ? it.collect { elem -> elem instanceof List ? elem.join(' ') : elem } : it }
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
-
-bbarcode_whitelist.view()
-
 
 // Define scRNA protocol related parameters
 
@@ -429,7 +421,7 @@ process starsolo {
 
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
-    file(whitelist) from barcode_whitelist
+    file whitelist from barcode_whitelist.collect()
     file index from star_index.collect()
 
     when:
@@ -446,13 +438,12 @@ process starsolo {
     prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
     bc_read = reads[0]
     cdna_read = reads[1]
-    bc_wl = whitelist.join(' ')
     
     """
     STAR \\
     --genomeDir ${index} \\
     --readFilesIn ${cdna_read} ${bc_read} \\
-    --soloCBwhitelist ${bc_wl} \\
+    --soloCBwhitelist ${whitelist} \\
     --runThreadN ${task.cpus} \\
     --outFileNamePrefix ${prefix}_ \\
     --alignIntronMax ${alignintronmax} \\
