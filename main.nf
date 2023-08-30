@@ -129,7 +129,7 @@ if (!params.scrna_protocol.equals("splitpool")){
     umi_position = '0_16_0_23'
 } else {
     cb_position = '0_0_0_7 0_8_0_17 0_18_0_25'
-    cb_position = '0_26_0_33'
+    umi_position = '0_26_0_33'
 }
 
 if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
