@@ -110,7 +110,7 @@ if( params.barcode_whitelist ){
 if( params.barcode_whitelist ){
     bbarcode_whitelist = Channel
         .fromPath(params.barcode_whitelist)
-        .toSortedList( { a, b -> a[0] <=> b[0] } ) 
+        .sort() 
 }
 
 bbarcode_whitelist.view()
