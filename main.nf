@@ -464,6 +464,7 @@ process starsolo {
     --soloMultiMappers ${params.solo_multi_mappers} \\
     --soloFeatures ${params.solo_features} \\
     --soloType CB_UMI_Complex \\
+    --soloUMIdedup Exact \\
     --soloCBposition ${cb_position} \\
     --soloUMIposition ${umi_position} \\
     --soloBarcodeReadLength ${params.bc_read_length} \\
