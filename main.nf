@@ -123,7 +123,7 @@ if( params.barcode_whitelist ){
     //    } 
 }
 
-bbarcode_whitelist.view()
+//bbarcode_whitelist.view()
 
 // Define scRNA protocol related parameters
 
