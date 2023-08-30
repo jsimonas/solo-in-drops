@@ -32,7 +32,6 @@ def helpMessage() {
 
     References:                       If not specified in the configuration file or you wish to overwrite any of the references
       --star_index [path/to/folder]   Path to star index directory (same as --genomeDir parameter in STAR)
-      --barcode_whitelist [file]      Path to cell barcode list (a text file containing one barcode sequence per line)
     
     STARsolo arguments:               If not specified, the default parameters will be used
       --bc_read_length [int]          Read length of cell barcode read. Default: equal to sum of BC + UMI
@@ -99,14 +98,6 @@ if( params.star_index ){
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
 }
 
-//Check barcode whitelist
-if( params.barcode_whitelist ){
-    barcode_whitelist = Channel
-        .fromPath(params.barcode_whitelist)
-        .toList()
-        .sort()
-        .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
-}
 
 // Define scRNA protocol related parameters
 
@@ -116,7 +107,23 @@ if (!params.scrna_protocol.equals("splitpool")){
 } else {
     mask = 'y*,I*,y*'
 }
+
 // STARsolo
+
+// barcode whitelist
+if(!params.scrna_protocol.equals("splitpool")){
+    barcode_whitelist = Channel
+        .fromPath("$baseDir/assets/barcodes/indrop/bc{1,2}_list.txt")
+        .toList()
+        .sort()
+} else {
+    barcode_whitelist = Channel
+        .fromPath("$baseDir/assets/barcodes/spitpool/bc{1,2,3}_list.txt")
+        .toList()
+        .sort()
+}
+
+// BC and UMI position
 if (!params.scrna_protocol.equals("splitpool")){
     cb_position = '0_0_0_7 0_8_0_15'
     umi_position = '0_16_0_23'
