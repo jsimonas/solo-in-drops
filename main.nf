@@ -100,7 +100,6 @@ if( params.star_index ){
 }
 
 //Check barcode whitelist
-// list > join > path
 if( params.barcode_whitelist ){
     barcode_whitelist = Channel
         .fromPath(params.barcode_whitelist)
@@ -108,22 +107,6 @@ if( params.barcode_whitelist ){
         .sort()
         .ifEmpty { exit 1, "barcode whitelist not found: ${params.barcode_whitelist}" }
 }
-
-if( params.barcode_whitelist ){
-    bbarcode_whitelist = Channel
-        .fromPath(params.barcode_whitelist)
-        .toList()
-        .sort()
-    //.set{bbarcode_whitelist}
-    //    .toSortedList( { a, b -> a[1] <=> b[1] } )
-    //    .sort { a, b ->
-    //        def A = a.tokenize('/').last()
-    //        def B = b.tokenize('/').last()
-    //        A <=> B
-    //    } 
-}
-
-//bbarcode_whitelist.view()
 
 // Define scRNA protocol related parameters
 
