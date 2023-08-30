@@ -110,7 +110,9 @@ if( params.barcode_whitelist ){
 if( params.barcode_whitelist ){
     bbarcode_whitelist = Channel
         .fromPath(params.barcode_whitelist)
-        .toSortedList( { a, b -> a[1] <=> b[1] } )
+        .toList()
+        .sort()
+    //    .toSortedList( { a, b -> a[1] <=> b[1] } )
     //    .sort { a, b ->
     //        def A = a.tokenize('/').last()
     //        def B = b.tokenize('/').last()
