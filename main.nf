@@ -102,34 +102,46 @@ if( params.star_index ){
 // Define scRNA protocol related parameters
 
 // bcl2fastq
-if (!params.scrna_protocol.equals("splitpool")){
-    mask = 'y*,I*,y*,y*'
-} else {
+if (!params.scrna_protocol.equals('indrops')){
     mask = 'y*,I*,y*'
+} else {
+    mask = 'y*,I*,y*,y*'
 }
 
 // STARsolo
 
 // barcode whitelist
-if(!params.scrna_protocol.equals("splitpool")){
+if (params.scrna_protocol.equals('universal')) {
+    barcode_whitelist = Channel
+        .fromPath("$baseDir/assets/barcodes/universal/bc{1,2,3}_list.txt")
+        .toList()
+        .sort()
+} else if (params.scrna_protocol.equals('splitpool')) {
+    barcode_whitelist = Channel
+        .fromPath("$baseDir/assets/barcodes/splitpool/bc{1,2,3}_list.txt")
+        .toList()
+        .sort()
+} else if (params.scrna_protocol.equals('indrops')) {
     barcode_whitelist = Channel
         .fromPath("$baseDir/assets/barcodes/indrop/bc{1,2}_list.txt")
         .toList()
         .sort()
 } else {
-    barcode_whitelist = Channel
-        .fromPath("$baseDir/assets/barcodes/spitpool/bc{1,2,3}_list.txt")
-        .toList()
-        .sort()
+    throw new IllegalArgumentException(
+        "Invalid scrna_protocol: ${params.scrna_protocol}. Supported values are 'universal', 'splitpool', 'indrops'."
+    )
 }
 
 // BC and UMI position
-if (!params.scrna_protocol.equals("splitpool")){
-    cb_position = '0_0_0_7 0_8_0_15'
-    umi_position = '0_16_0_23'
-} else {
+if (params.scrna_protocol.equals('universal')) {
+    cb_position = '0_0_0_7 0_8_0_17 0_18_0_25'
+    umi_position = '0_26_0_35'
+} else if (params.scrna_protocol.equals('splitpool')){
     cb_position = '0_0_0_7 0_8_0_17 0_18_0_25'
     umi_position = '0_26_0_33'
+} else if (params.scrna_protocol.equals('indrops')){
+    cb_position = '0_0_0_7 0_8_0_15'
+    umi_position = '0_16_0_23'
 }
 
 if (!(params.align_mode.equals('cell') || params.align_mode.equals('bacteria'))){
@@ -387,6 +399,14 @@ process mergefastq {
     """
     zcat ${R1} \\
     | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,5,8)substr(\$0,18,10)substr(\$0,32,8)substr(\$0,1,4)substr(\$0,40,4)}1 ' \\
+    | gzip > ${prefix}_bc_001.fastq.gz
+    cp ${R2} ${prefix}_cdna_001.fastq.gz
+    """
+    }
+    } else if (params.scrna_protocol.equals('universal')){
+    """
+    zcat ${R1} \\
+    | awk 'NR%4==2 || NR%4==0{\$0=substr(\$0,6,8)substr(\$0,18,10)substr(\$0,32,8)substr(\$0,1,5)substr(\$0,40,5)}1 ' \\
     | gzip > ${prefix}_bc_001.fastq.gz
     cp ${R2} ${prefix}_cdna_001.fastq.gz
     """
