@@ -402,7 +402,6 @@ process mergefastq {
     | gzip > ${prefix}_bc_001.fastq.gz
     cp ${R2} ${prefix}_cdna_001.fastq.gz
     """
-    }
     } else if (params.scrna_protocol.equals('universal')){
     """
     zcat ${R1} \\
