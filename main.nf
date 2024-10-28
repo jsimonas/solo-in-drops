@@ -102,10 +102,10 @@ if( params.star_index ){
 // Define scRNA protocol related parameters
 
 // bcl2fastq
-if (!params.scrna_protocol.equals('indrops')){
-    mask = 'y*,I*,y*'
-} else {
+if (params.scrna_protocol.equals('indrops')){
     mask = 'y*,I*,y*,y*'
+} else {
+     mask = 'y*,I*,y*'
 }
 
 // STARsolo
