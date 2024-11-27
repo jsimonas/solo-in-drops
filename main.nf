@@ -451,8 +451,9 @@ process starsolo {
     file index from star_index.collect()
 
     when:
-    !(params.run_module.equals('demux')) 
-
+//    !(params.run_module.equals('demux')) 
+    !(params.run_module.equals('demux')) && (params.scrna_protocol in ['splitpool', 'indrops', 'universal'])
+    
     output:
     file "*.bam"
     file "*.out" 
