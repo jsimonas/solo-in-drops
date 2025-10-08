@@ -237,6 +237,7 @@ process get_software_versions {
     bcl2fastq --version |& grep "bcl" &> v_bcl2fastq.txt
     seqkit version &> v_seqkit.txt
     fastqc -version |& grep "v" &> v_fastqc.txt
+    cutadapt --version &> v_cutadapt.txt
     multiqc --version &> v_multiqc.txt || true
     scrape_software_versions.py &> software_versions_mqc.yaml
     """
@@ -428,7 +429,44 @@ if(params.run_module.equals('fastq')){
 }
 
 /*
- * STEP 5 - STARsolo
+ * STEP 5 - cutadapt trim
+ */
+process cutadapt_trim {
+    tag "$prefix"
+    label 'process_medium'
+    publishDir "${params.outdir}/", mode: 'copy',
+        saveAs: {
+            filename -> 
+            if(params.run_module.equals('fastq')){
+                "trimmed_fastq/$prefix/$filename"
+            }
+            else {
+                "${projectName}/trimmed_fastq/$prefix/$filename"
+            }
+        }
+
+    input:
+    set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
+
+    output:
+    set val(prefix), val(projectName), file("*_trimmed_{bc,cdna}_001.fastq.gz") into trimmed_fastq_ch
+
+    script:
+    bc_read = reads[0]
+    cdna_read = reads[1]
+    
+    """
+    cutadapt \\
+        -G AAGCAGTGGTATCAACGCAGAGTACAT -m :40 \\
+        -o ${prefix}_trimmed_bc_001.fastq.gz \\
+        -p ${prefix}_trimmed_cdna_001.fastq.gz \\
+        ${bc_read} \\
+        ${cdna_read}
+    """
+}
+
+/*
+ * STEP 6 - STARsolo
  */
 process starsolo {
     tag "$prefix"
@@ -446,7 +484,7 @@ process starsolo {
     echo true
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
+    set val(prefix), val(projectName), file(reads) from trimmed_fastq_ch
     path whitelist from barcode_whitelist.collect()
     file index from star_index.collect()
 
@@ -509,7 +547,7 @@ process starsolo {
 
 
 /*
- * STEP 6 - MultiQC 
+ * STEP 7 - MultiQC 
  */
 process multiqc {
     tag "$runName"
@@ -543,7 +581,7 @@ process multiqc {
 }
 
 /*
- * STEP 7 - Output Description HTML
+ * STEP 8 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',

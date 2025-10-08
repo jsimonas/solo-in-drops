@@ -21,4 +21,5 @@ dependencies:
   - bioconda::star=2.7.10b
   - bioconda::samtools=1.11
   - bioconda::seqkit=2.0.0
+  - bioconda::cutadapt=4.2
   - Freenome::bcl2fastq=2.20
