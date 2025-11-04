@@ -9,6 +9,7 @@ regexes = {
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
+    'cutadapt': ['v_cutadapt.txt', r"(\S+)"],
     'STAR': ['v_star.txt', r"(\S+)"],
     'SAMtools': ['v_samtools.txt', r"samtools (\S+)"],
     'bcl2fastq': ['v_bcl2fastq.txt', r"bcl2fastq v(\S+)"],
@@ -20,6 +21,7 @@ results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
 results['bcl2fastq'] = '<span style="color:#999999;\">N/A</span>'
 results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
 results['SeqKit'] = '<span style="color:#999999;\">N/A</span>'
+results['cutadapt'] = '<span style="color:#999999;\">N/A</span>'
 results['STAR'] = '<span style="color:#999999;\">N/A</span>'
 results['SAMtools'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
