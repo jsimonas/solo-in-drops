@@ -447,10 +447,13 @@ process cutadapt_trim {
 
     input:
     set val(prefix), val(projectName), file(reads) from merged_fastq_ch
+    
+    when:
+    !(params.run_module.equals('demux')) 
 
     output:
     set val(prefix), val(projectName), file("*_trimmed_{bc,cdna}_001.fastq.gz") into trimmed_fastq_ch
-
+    
     script:
     bc_read = reads[0]
     cdna_read = reads[1]
