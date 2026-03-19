@@ -438,15 +438,15 @@ process cutadapt_trim {
         saveAs: {
             filename -> 
             if(params.run_module.equals('fastq')){
-                "trimmed_fastq/$prefix/$filename"
+                "trimmed_fastq/$filename"
             }
             else {
-                "${projectName}/trimmed_fastq/$prefix/$filename"
+                "${projectName}/trimmed_fastq/$filename"
             }
         }
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastq_ch
 
     output:
     set val(prefix), val(projectName), file("*_trimmed_{bc,cdna}_001.fastq.gz") into trimmed_fastq_ch
@@ -499,7 +499,7 @@ process starsolo {
     set val(projectName), file("*_Solo.out/${prefix}_Barcodes.stats") into barcodes_stats_ch
 
     script:
-    prefix = reads[0].toString() - ~/(_bc_001)?(\.fastq)?(\.gz)?$/
+    prefix = reads[0].toString() - ~/(_trimmed)?(_bc_001)?(\.fastq)?(\.gz)?$/
     bc_read = reads[0]
     cdna_read = reads[1]
     
