@@ -446,7 +446,7 @@ process cutadapt_trim {
         }
 
     input:
-    set val(prefix), val(projectName), file(reads) from merged_fastq_ch
+    set val(prefix), val(projectName), file(reads) from merged_fastq_paired_ch
     
     when:
     !(params.run_module.equals('demux')) 
